@@ -150,7 +150,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "arie-ai",
+      "owner": "sgbbedhyjcfbgvayhisuregbrebd",
       "repo": "arie-ai",
       "private": true
     },
