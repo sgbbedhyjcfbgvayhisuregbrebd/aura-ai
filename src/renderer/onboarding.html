@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com">
+<title>Arie AI — Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050D18;--s1:#081629;--s2:#0B1C33;--s3:#0F2240;--a1:#1E54D4;--a2:#2E6BF7;--a3:#5B8FF9;--cy:#08B5CF;--gn:#0FA870;--rs:#E53565;--gd:#E09B1A;--tx:#C8D9ED;--d1:#6B84A0;--d2:#364E6A;--d3:#1D3248;--br:rgba(255,255,255,.055);--gl:rgba(255,255,255,.025);--fh:'Syne',sans-serif;--fb:'IBM Plex Sans',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;overflow:hidden;user-select:none;-webkit-app-region:no-drag}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--d3)}
+.tb{height:28px;-webkit-app-region:drag;background:var(--bg);flex-shrink:0}
+.wrap{display:flex;flex-direction:column;height:100vh}
+.body{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:24px 24px 32px}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.logo-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--a1),var(--cy));display:flex;align-items:center;justify-content:center}
+.logo-mark::after{content:'';width:12px;height:12px;border-radius:50%;background:#fff;opacity:.9}
+.logo-name{font-family:var(--fh);font-size:17px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.dots{display:flex;gap:6px;margin-bottom:28px}
+.dot{width:24px;height:4px;border-radius:2px;background:var(--d3);transition:all .25s}
+.dot.done{background:var(--a1)}.dot.on{background:var(--cy);width:36px}
+.card{width:100%;max-width:460px;background:var(--s1);border:1px solid var(--br);border-radius:16px;padding:28px}
+.card-title{font-family:var(--fh);font-size:19px;font-weight:800;color:#fff;margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--d1);margin-bottom:22px;line-height:1.6}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl{font-size:10.5px;font-weight:600;color:var(--d1);text-transform:uppercase;letter-spacing:.8px}
+.fi{background:var(--s2);border:1px solid var(--d3);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:13px;font-family:var(--fb);outline:none;transition:border-color .15s;-webkit-app-region:no-drag}
+.fi:focus{border-color:var(--a2)}.fi::placeholder{color:var(--d2)}
+.err{font-size:11px;color:var(--rs);display:none}.err.on{display:block}
+.pw-bar{height:3px;background:var(--d3);border-radius:2px;margin-top:6px;overflow:hidden}
+.pw-fill{height:100%;border-radius:2px;transition:width .2s,background .2s;width:0}
+.pw-lbl{font-size:10px;color:var(--d2);margin-top:3px}
+.btn-main{width:100%;padding:12px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;margin-top:20px;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-main:hover{opacity:.88}.btn-main:disabled{opacity:.4;cursor:not-allowed}
+.step{display:none;flex-direction:column;align-items:center;width:100%;animation:fadeUp .2s ease}
+.step.on{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.opt-grid{display:grid;gap:10px;margin-bottom:4px}
+.opt-grid.cols-3{grid-template-columns:repeat(3,1fr)}.opt-grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.opt-tile{padding:14px 12px;border-radius:10px;border:1.5px solid var(--d3);background:var(--s2);cursor:pointer;transition:all .15s;text-align:center}
+.opt-tile:hover{border-color:var(--d2);background:var(--s3)}.opt-tile.sel{border-color:var(--a2);background:rgba(30,84,212,.1)}
+.ot-icon{font-size:22px;margin-bottom:7px}.ot-label{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px}.ot-sub{font-size:10.5px;color:var(--d1);line-height:1.5}
+.ind-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:4px}
+.ind-tile{padding:12px;border-radius:10px;border:1.5px solid var(--d3);background:var(--s2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
+.ind-tile:hover{border-color:var(--d2)}.ind-tile.sel{border-color:var(--a2);background:rgba(30,84,212,.1)}
+.ind-ic{font-size:18px;flex-shrink:0}.ind-name{font-size:12px;font-weight:600;color:var(--tx)}.ind-sub{font-size:10.5px;color:var(--d1);margin-top:1px}
+.ind-preview{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--s2);border:1px solid var(--d3);font-size:11px;color:var(--d1);line-height:1.6;min-height:48px;transition:opacity .15s}
+.sn-row{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;border-radius:9px;background:var(--gl);border:1px solid var(--br);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.sn-row:hover{background:rgba(255,255,255,.04)}.sn-row.done{border-color:rgba(10,168,112,.3);background:rgba(10,168,112,.05)}
+.sn-num{width:22px;height:22px;border-radius:50%;background:var(--d3);color:var(--d1);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.sn-row.done .sn-num{background:var(--gn);color:#fff}.sn-body{flex:1}
+.sn-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:2px}
+.sn-detail{font-size:11.5px;color:var(--d1);line-height:1.6;display:none}.sn-row.open .sn-detail{display:block}
+.key-wrap{position:relative;margin-top:4px}
+.key-input{width:100%;background:var(--s2);border:1px solid var(--d3);border-radius:8px;padding:9px 38px 9px 12px;color:var(--tx);font-size:12.5px;font-family:monospace;outline:none;transition:border-color .15s}
+.key-input:focus{border-color:var(--a2)}.key-input.ok{border-color:var(--gn)}.key-input.bad{border-color:var(--rs)}
+.key-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--d1);cursor:pointer;font-size:14px;padding:0}
+.key-status{font-size:11px;margin-top:5px;min-height:16px;display:flex;align-items:center;gap:5px}
+.ks-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--d2);font-size:11px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--br)}
+.code-box{background:var(--s3);border:1px solid var(--a1);border-radius:10px;padding:16px;text-align:center;margin:12px 0;cursor:pointer}
+.code-val{font-family:monospace;font-size:28px;font-weight:800;color:#fff;letter-spacing:8px;margin-bottom:6px}
+.code-hint{font-size:11px;color:var(--d1)}
+.info-box{background:rgba(30,84,212,.07);border:1px solid rgba(46,107,247,.2);border-radius:9px;padding:12px 14px;margin-bottom:14px}
+.info-box.warn{background:rgba(224,155,26,.07);border-color:rgba(224,155,26,.22)}
+.ib-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;color:var(--a3)}
+.info-box.warn .ib-title{color:#FCD34D}
+.ib-body{font-size:11.5px;color:var(--d1);line-height:1.7}
+.success-icon{width:52px;height:52px;border-radius:50%;background:rgba(10,168,112,.12);border:1.5px solid rgba(10,168,112,.3);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gn);margin:0 auto 14px}
+.success-title{font-family:var(--fh);font-size:20px;font-weight:800;color:#fff;text-align:center;margin-bottom:6px}
+.success-sub{font-size:12px;color:var(--d1);text-align:center;line-height:1.7;margin-bottom:20px}
+.feats{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.feat{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--d1)}
+.feat-ic{color:var(--gn);font-weight:700;flex-shrink:0;margin-top:1px}
+.ws-preview{background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;margin:10px 0;display:none}
+.ws-preview.on{display:block}.wp-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px}.wp-meta{font-size:11.5px;color:var(--d1)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tb"></div>
+  <div class="body">
+
+    <!-- STEP 1: Account -->
+    <div class="step on" id="step-1">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-1"></div>
+      <div class="card">
+        <div class="card-title">Create your account</div>
+        <div class="card-sub">Your details are stored locally and used to personalise your AI assistant.</div>
+        <div class="fg"><label class="fl">Full name</label><input class="fi" id="f-name" placeholder="Alex Hansen"></div>
+        <div class="fg"><label class="fl">Work email</label><input class="fi" id="f-email" type="email" placeholder="alex@yourcompany.com"><div class="err" id="err-email">Enter a valid email address</div></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" id="f-pw" type="password" placeholder="At least 8 characters" oninput="checkPw(this.value)"><div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div><div class="pw-lbl" id="pw-lbl"></div></div>
+        <button class="btn-main" onclick="goStep2()">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Industry -->
+    <div class="step" id="step-2">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-2"></div>
+      <div class="card">
+        <div class="card-title">What's your industry?</div>
+        <div class="card-sub">Arie AI adapts its language, triage rules, deadlines, and drafting style to your profession.</div>
+        <div class="ind-grid">
+          <div class="ind-tile sel" data-ind="consulting" onclick="selIndustry(this)"><div class="ind-ic">🏛️</div><div><div class="ind-name">Consulting</div><div class="ind-sub">Government & commercial advisory</div></div></div>
+          <div class="ind-tile" data-ind="legal" onclick="selIndustry(this)"><div class="ind-ic">⚖️</div><div><div class="ind-name">Legal</div><div class="ind-sub">Law firms, solicitors & in-house counsel</div></div></div>
+          <div class="ind-tile" data-ind="finance" onclick="selIndustry(this)"><div class="ind-ic">📊</div><div><div class="ind-name">Finance</div><div class="ind-sub">Accounting, financial planning & tax</div></div></div>
+          <div class="ind-tile" data-ind="realestate" onclick="selIndustry(this)"><div class="ind-ic">🏠</div><div><div class="ind-name">Real Estate</div><div class="ind-sub">Sales, property management & advocacy</div></div></div>
+        </div>
+        <div class="ind-preview" id="ind-preview"></div>
+        <button class="btn-main" onclick="showStep(3)">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Account type -->
+    <div class="step" id="step-3">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-3"></div>
+      <div class="card">
+        <div class="card-title">How will you use Arie AI?</div>
+        <div class="card-sub">This determines your billing and team setup.</div>
+        <div class="opt-grid cols-3">
+          <div class="opt-tile sel" data-type="solo" onclick="selAccountType(this)"><div class="ot-icon">🧑</div><div class="ot-label">Just me</div><div class="ot-sub">Individual, own billing</div></div>
+          <div class="opt-tile" data-type="ceo" onclick="selAccountType(this)"><div class="ot-icon">👔</div><div class="ot-label">Team admin</div><div class="ot-sub">Manage a workspace</div></div>
+          <div class="opt-tile" data-type="staff" onclick="selAccountType(this)"><div class="ot-icon">👥</div><div class="ot-label">Team member</div><div class="ot-sub">Joining with invite code</div></div>
+        </div>
+        <div id="staff-section" style="display:none;margin-top:14px">
+          <div class="fl" style="margin-bottom:8px">Billing arrangement</div>
+          <div class="opt-grid cols-2" style="margin-bottom:14px">
+            <div class="opt-tile sel" data-billing="individual" onclick="selBilling(this)"><div class="ot-icon">💳</div><div class="ot-label">My own</div><div class="ot-sub">I have my own Anthropic key</div></div>
+            <div class="opt-tile" data-billing="shared" onclick="selBilling(this)"><div class="ot-icon">🤝</div><div class="ot-label">Company pays</div><div class="ot-sub">Admin set this up for me</div></div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">Workspace invite code</label>
+            <input class="fi" id="ws-code" placeholder="e.g. ARIA7X2Q" style="text-transform:uppercase;font-family:monospace;letter-spacing:3px;font-size:15px" oninput="onCodeInput(this.value)" maxlength="8">
+          </div>
+          <div class="ws-preview" id="ws-preview"><div class="wp-name" id="wp-name"></div><div class="wp-meta" id="wp-meta"></div></div>
+        </div>
+        <button class="btn-main" onclick="goStep4()">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Plan -->
+    <div class="step" id="step-4">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-4"></div>
+      <div class="card">
+        <div class="card-title">Arie AI plan</div>
+        <div class="card-sub">$10/month per seat. Cancel any time.</div>
+        <div style="background:linear-gradient(135deg,rgba(30,84,212,.12),rgba(8,181,207,.07));border:1px solid rgba(46,107,247,.25);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a1),var(--cy))"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div style="font-family:var(--fh);font-size:15px;font-weight:800;color:#fff;margin-bottom:3px">Professional</div><div style="font-size:11px;color:var(--d1)">Everything included. No caps.</div></div>
+            <div style="text-align:right"><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:#fff">$10</div><div style="font-size:10px;color:var(--d1)">/month</div></div>
+          </div>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:5px">
+            <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>Email triage + AI drafts</div>
+            <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>Calendar intelligence + briefings</div>
+            <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>Document summarisation</div>
+            <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>Writing style learning</div>
+            <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>AI chat + cost tracking</div>
+          </div>
+        </div>
+        <div class="info-box warn" style="margin-bottom:14px">
+          <div class="ib-title">Two separate bills</div>
+          <div class="ib-body" id="billing-note-body">Arie AI charges $10/month for the platform. Anthropic charges you separately for AI usage.</div>
+        </div>
+        <button class="btn-main" id="btn-pay" onclick="processPlan()">Subscribe — $10/month</button>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--d2)">Secured by Stripe. Cancel any time.</div>
+      </div>
+    </div>
+
+    <!-- STEP 5: API key -->
+    <div class="step" id="step-5">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-5"></div>
+      <div class="card">
+        <div class="card-title">Connect Claude</div>
+        <div class="card-sub">Arie AI uses your own Anthropic API key. AI costs go directly to your account — we never mark them up.</div>
+        <div class="sn-row open" id="sn1" onclick="toggleSN(1)"><div class="sn-num">1</div><div class="sn-body"><div class="sn-title">Create an Anthropic account</div><div class="sn-detail">Go to <a href="#" onclick="openExt('https://console.anthropic.com');return false" style="color:var(--a3)">console.anthropic.com</a> and sign up or log in.</div></div></div>
+        <div class="sn-row" id="sn2" onclick="toggleSN(2)"><div class="sn-num">2</div><div class="sn-body"><div class="sn-title">Add a credit card or buy credits</div><div class="sn-detail">Go to Billing and add a payment method. You need at least $5 of credit to start.</div></div></div>
+        <div class="sn-row" id="sn3" onclick="toggleSN(3)"><div class="sn-num">3</div><div class="sn-body"><div class="sn-title">Create an API key</div><div class="sn-detail">Go to API Keys and create a key. Name it "Arie AI". It starts with <strong style="color:var(--tx)">sk-ant-api03-</strong> — copy it immediately.</div></div></div>
+        <div class="sn-row" id="sn4" onclick="toggleSN(4)"><div class="sn-num">4</div><div class="sn-body"><div class="sn-title">Set a monthly spend limit</div><div class="sn-detail">Go to Billing → Usage limits. $20–30 is plenty for most users. Prevents unexpected charges.</div></div></div>
+        <div class="divider">paste your key below</div>
+        <div class="key-wrap"><input class="key-input" id="api-key" type="password" placeholder="sk-ant-api03-..." oninput="onKeyInput(this.value)"><button class="key-toggle" onclick="toggleKeyVis()">👁</button></div>
+        <div class="key-status" id="key-status"></div>
+        <button class="btn-main" id="btn-connect" onclick="validateKey()" disabled>Connect Claude</button>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--d2)">Stored encrypted on your device. Never sent to Arie AI.</div>
+      </div>
+    </div>
+
+    <!-- STEP 6: CEO workspace setup -->
+    <div class="step" id="step-6">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-6"></div>
+      <div class="card">
+        <div class="card-title">Create your workspace</div>
+        <div class="card-sub">Your team joins using an invite code. Choose how AI costs are handled.</div>
+        <div class="fg"><label class="fl">Workspace name</label><input class="fi" id="ws-name" placeholder="e.g. Arie AI"></div>
+        <div class="fl" style="margin-bottom:8px">Team billing mode</div>
+        <div class="opt-grid cols-2" style="margin-bottom:14px">
+          <div class="opt-tile sel" data-billing="individual" onclick="selWorkspaceBilling(this)"><div class="ot-icon">💳</div><div class="ot-label">Individual</div><div class="ot-sub">Each person uses their own Anthropic key</div></div>
+          <div class="opt-tile" data-billing="shared" onclick="selWorkspaceBilling(this)"><div class="ot-icon">🏢</div><div class="ot-label">Company pays</div><div class="ot-sub">Your key covers the whole team</div></div>
+        </div>
+        <div id="shared-key-section" style="display:none">
+          <div class="info-box warn" style="margin-bottom:12px"><div class="ib-title">Shared key mode</div><div class="ib-body">Your Anthropic key will be used for all team members. You see per-person cost breakdowns in the admin dashboard.</div></div>
+          <div class="fg"><label class="fl">Your Anthropic API key</label><div class="key-wrap"><input class="key-input" id="shared-key" type="password" placeholder="sk-ant-api03-..."><button class="key-toggle" onclick="document.getElementById('shared-key').type=document.getElementById('shared-key').type==='password'?'text':'password'">👁</button></div></div>
+        </div>
+        <button class="btn-main" id="btn-create-ws" onclick="createWorkspace()">Create workspace</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: CEO invite code -->
+    <div class="step" id="step-7">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-7"></div>
+      <div class="card">
+        <div class="success-icon">🔑</div>
+        <div class="success-title">Workspace created</div>
+        <div class="success-sub">Share this code with your team. They enter it during their Arie AI setup.</div>
+        <div class="code-box" onclick="copyCode()">
+          <div class="code-val" id="invite-code-display">--------</div>
+          <div class="code-hint">Click to copy</div>
+        </div>
+        <div class="info-box" style="margin-bottom:16px"><div class="ib-title">What happens next</div><div class="ib-body">Staff enter this code when they set up Arie AI. You see them appear in your admin panel. Revoke access and regenerate codes any time from Settings.</div></div>
+        <div class="feats">
+          <div class="feat"><div class="feat-ic">✓</div>Full team cost dashboard — per person and per feature</div>
+          <div class="feat"><div class="feat-ic">✓</div>Activity tracking per team member (optional, E2EE)</div>
+          <div class="feat"><div class="feat-ic">✓</div>Remove members and regenerate codes from Settings</div>
+        </div>
+        <button class="btn-main" onclick="launchApp()">Open Arie AI</button>
+      </div>
+    </div>
+
+    <!-- STEP 8: Ready -->
+    <div class="step" id="step-8">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="dots" id="dots-8"></div>
+      <div class="card">
+        <div class="success-icon">✓</div>
+        <div class="success-title">You're all set</div>
+        <div class="success-sub">Arie AI is ready. Connect your email and calendar in the Connections page.</div>
+        <div class="info-box warn" id="cost-warning" style="margin-bottom:16px"><div class="ib-title">About AI costs</div><div class="ib-body">Every query uses Anthropic credits. Set a monthly limit at <a href="#" onclick="openExt('https://console.anthropic.com');return false" style="color:var(--a3)">console.anthropic.com</a> to stay in control.</div></div>
+
+        <!-- Referral section — hidden for staff accounts -->
+        <div id="referral-section" style="margin-bottom:16px;padding:14px;border-radius:10px;border:1.5px solid var(--d3);background:var(--s2)">
+          <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px">Did someone tell you about Arie?</div>
+          <div style="font-size:11px;color:var(--d1);margin-bottom:10px">If a colleague referred you, you'll both get your first month free.</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div style="font-size:11px;color:var(--d1);white-space:nowrap">Have a referral code?</div>
+            <input id="referral-code-input" class="fi" style="font-size:12px;letter-spacing:2px;text-transform:uppercase;flex:1" maxlength="8" placeholder="XXXXXXXX" oninput="validateReferralCode(this.value)">
+            <div id="referral-status" style="font-size:11px;min-width:60px"></div>
+          </div>
+          <div id="referral-message" style="font-size:11px;color:var(--gn);margin-top:6px;display:none"></div>
+        </div>
+
+        <div class="feats">
+          <div class="feat"><div class="feat-ic">✓</div>Email triage — summarised and drafted automatically</div>
+          <div class="feat"><div class="feat-ic">✓</div>Calendar intelligence — briefings and conflict detection</div>
+          <div class="feat"><div class="feat-ic">✓</div>AI Hub — Claude, ChatGPT, Gemini and more in one place</div>
+          <div class="feat"><div class="feat-ic">✓</div>Writing style learning — adapts to how you write</div>
+          <div class="feat"><div class="feat-ic">✓</div>Document chat — ask questions about any document</div>
+          <div class="feat"><div class="feat-ic">✓</div>Template library — shared team templates</div>
+        </div>
+        <button class="btn-main" onclick="launchApp()">Open Arie AI</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+const state = { name:'', email:'', password:'', industry:'consulting', accountType:'solo', billingMode:'individual', workspaceBilling:'individual', wsCode:'', wsId:null, apiKey:'', sharedApiKey:'', inviteCode:'', paymentDone:false, referralCode:'' };
+const FLOWS = { solo:[1,2,3,4,5,8], ceo:[1,2,3,4,5,6,7], staff_individual:[1,2,3,4,5,8], staff_shared:[1,2,3,4,8] };
+function flowKey(){ return state.accountType==='staff'&&state.billingMode==='shared'?'staff_shared':state.accountType==='staff'?'staff_individual':state.accountType; }
+function renderDots(id){ const flow=FLOWS[flowKey()]; const pos=flow.indexOf(id); const c=document.getElementById('dots-'+id); if(!c)return; c.innerHTML=flow.map((_,i)=>i<pos?'<div class="dot done"></div>':i===pos?'<div class="dot on"></div>':'<div class="dot"></div>').join(''); }
+function showStep(id){ document.querySelectorAll('.step').forEach(s=>s.classList.remove('on')); const el=document.getElementById('step-'+id); if(el){el.classList.add('on');renderDots(id);} }
+// Set default industry preview on load
+document.addEventListener('DOMContentLoaded', () => { const prev=document.getElementById('ind-preview'); if(prev) prev.textContent=INDUSTRY_PREVIEWS['consulting']; });
+
+// ── Referral code handling ────────────────────────────────────────
+let referralValidated = false;
+let referralDebounce = null;
+
+function validateReferralCode(val) {
+  clearTimeout(referralDebounce);
+  const status = document.getElementById('referral-status');
+  const msg = document.getElementById('referral-message');
+  if (!val || val.length < 8) { status.textContent = ''; msg.style.display='none'; referralValidated=false; return; }
+  status.textContent = '…';
+  referralDebounce = setTimeout(async () => {
+    try {
+      const r = await fetch('http://localhost:3001/api/referrals/validate', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ code: val.toUpperCase() })
+      });
+      const d = await r.json();
+      if (r.ok && d.valid) {
+        status.innerHTML = '<span style="color:var(--gn)">✓</span>';
+        msg.textContent = d.message;
+        msg.style.display = 'block';
+        referralValidated = true;
+        state.referralCode = val.toUpperCase();
+      } else {
+        status.innerHTML = '<span style="color:var(--rs)">✗ Invalid</span>';
+        msg.style.display = 'none';
+        referralValidated = false;
+      }
+    } catch { status.textContent = ''; }
+  }, 600);
+}
+
+// Hide referral section for staff accounts
+function updateReferralVisibility() {
+  const section = document.getElementById('referral-section');
+  if (section) section.style.display = state.accountType === 'staff' ? 'none' : 'block';
+}
+function goStep2(){ const n=document.getElementById('f-name').value.trim(),e=document.getElementById('f-email').value.trim(),p=document.getElementById('f-pw').value; if(!n||p.length<8)return; if(!e.includes('@')||!e.includes('.')){document.getElementById('err-email').classList.add('on');return;} document.getElementById('err-email').classList.remove('on'); state.name=n;state.email=e;state.password=p; showStep(2); }
+const INDUSTRY_PREVIEWS = {
+  consulting: '🏛️ Arie will use consulting language (workstreams, deliverables, uplift), flag scope creep, prioritise government correspondence, and frame everything around risk, cost, and stakeholder impact.',
+  legal: '⚖️ Arie will use formal legal register, extract and calendar limitation dates and filing deadlines, preserve privilege markers, flag conflict checks for new client names, and draft precise billing narratives.',
+  finance: '📊 Arie will track ATO deadlines (BAS, IAS, STP, EOFY), flag Div 7A, CGT, GST, and SMSF issues, distinguish general information from personal advice, and use plain English for retail clients.',
+  realestate: '🏠 Arie will classify enquiries (buyer/seller/rental), extract settlement and cooling-off dates, write lifestyle-first listing copy, personalise buyer follow-ups, and flag maintenance requests for 24-hour response.',
+};
+function selIndustry(el){ document.querySelectorAll('.ind-tile').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.industry=el.dataset.ind; const prev=document.getElementById('ind-preview'); if(prev){ prev.style.opacity='0'; setTimeout(()=>{prev.textContent=INDUSTRY_PREVIEWS[state.industry]||'';prev.style.opacity='1';},100); } }
+function selAccountType(el){ document.querySelectorAll('.opt-tile[data-type]').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.accountType=el.dataset.type; document.getElementById('staff-section').style.display=state.accountType==='staff'?'block':'none'; }
+function selBilling(el){ document.querySelectorAll('#staff-section .opt-tile[data-billing]').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.billingMode=el.dataset.billing; }
+let _cd=null;
+function onCodeInput(val){ const u=val.toUpperCase().replace(/[^A-Z0-9]/g,''); document.getElementById('ws-code').value=u; state.wsCode=u; document.getElementById('ws-preview').classList.remove('on'); clearTimeout(_cd); if(u.length===8)_cd=setTimeout(()=>validateWsCode(u),400); }
+async function validateWsCode(code){ try{ const r=await fetch('http://localhost:3001/workspaces/validate/'+code); const d=await r.json(); if(r.ok&&d.workspace){ document.getElementById('wp-name').textContent=d.workspace.name; document.getElementById('wp-meta').textContent='Managed by '+(d.workspace.ceoName||'your admin')+' · '+(d.workspace.billingMode==='shared'?'Company pays AI costs':'Individual billing'); document.getElementById('ws-preview').classList.add('on'); if(d.workspace.billingMode==='shared'){state.billingMode='shared';document.querySelectorAll('#staff-section .opt-tile[data-billing="shared"]').forEach(t=>{t.click();});} }}catch{} }
+async function goStep4(){ if(state.accountType==='staff'&&state.wsCode.length!==8){alert('Enter your 8-character invite code.');return;} if(state.accountType==='staff'&&state.billingMode==='shared')document.getElementById('billing-note-body').textContent='Your team admin covers AI costs. You just pay the $10/month Arie AI seat fee.'; showStep(4); }
+function processPlan(){ const btn=document.getElementById('btn-pay'); btn.innerHTML='<div class="spin"></div>Opening Stripe...'; btn.disabled=true; const link='https://buy.stripe.com/YOUR_STRIPE_LINK'; if(window.arie){window.arie.shell.open(link); setTimeout(()=>{ if(!state.paymentDone){btn.innerHTML="I've completed payment";btn.disabled=false;btn.onclick=()=>{ state.paymentDone=true;afterPayment(); };} },10000); window.arie.onPaymentComplete(()=>{ state.paymentDone=true;afterPayment(); }); }else{ setTimeout(()=>{ state.paymentDone=true; btn.innerHTML='Subscribe — $10/month'; btn.disabled=false; afterPayment(); },1000); } }
+function afterPayment(){ if(state.accountType==='staff'&&state.billingMode==='shared')showStep(8); else showStep(5); }
+function toggleSN(n){ document.querySelectorAll('.sn-row').forEach((r,i)=>r.classList.toggle('open',i+1===n)); }
+function openExt(url){ if(window.arie)window.arie.shell.open(url); else window.open(url,'_blank'); document.getElementById('sn1')&&document.getElementById('sn1').classList.add('done'); }
+function toggleKeyVis(){ const i=document.getElementById('api-key'); i.type=i.type==='password'?'text':'password'; }
+function onKeyInput(val){ const btn=document.getElementById('btn-connect'),inp=document.getElementById('api-key'),sts=document.getElementById('key-status'); inp.classList.remove('ok','bad'); if(!val){sts.innerHTML='';btn.disabled=true;return;} if(val.startsWith('sk-ant')){sts.innerHTML='<div class="ks-dot" style="background:var(--gd)"></div><span style="color:var(--d1)">Looks right — click Connect to verify</span>';btn.disabled=false;}else{sts.innerHTML='<div class="ks-dot" style="background:var(--rs)"></div><span style="color:var(--rs)">Should start with sk-ant-api03-</span>';inp.classList.add('bad');btn.disabled=true;} }
+async function validateKey(){ const key=document.getElementById('api-key').value.trim(),btn=document.getElementById('btn-connect'),sts=document.getElementById('key-status'),inp=document.getElementById('api-key'); btn.innerHTML='<div class="spin"></div>Verifying...';btn.disabled=true; if(window.arie){ const r=await window.arie.onboard.validateKey(key); if(r.valid){inp.classList.add('ok');sts.innerHTML='<div class="ks-dot" style="background:var(--gn)"></div><span style="color:var(--gn)">Valid — connected to Anthropic</span>';state.apiKey=key;btn.innerHTML='Connected ✓';setTimeout(()=>{ if(state.accountType==='ceo')showStep(6); else showStep(8); },800);}else{inp.classList.add('bad');sts.innerHTML='<div class="ks-dot" style="background:var(--rs)"></div><span style="color:var(--rs)">'+(r.error||'Invalid — check and try again')+'</span>';btn.innerHTML='Connect Claude';btn.disabled=false;} }else{ setTimeout(()=>{inp.classList.add('ok');sts.innerHTML='<div class="ks-dot" style="background:var(--gn)"></div><span style="color:var(--gn)">Connected (dev mode)</span>';state.apiKey=key;btn.innerHTML='Connected ✓';setTimeout(()=>{ if(state.accountType==='ceo')showStep(6); else showStep(8); },800);},1200); } }
+function selWorkspaceBilling(el){ document.querySelectorAll('#step-6 .opt-tile[data-billing]').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.workspaceBilling=el.dataset.billing;document.getElementById('shared-key-section').style.display=state.workspaceBilling==='shared'?'block':'none'; }
+async function createWorkspace(){ const name=document.getElementById('ws-name').value.trim(); if(!name){alert('Enter a workspace name.');return;} if(state.workspaceBilling==='shared'&&!document.getElementById('shared-key').value.startsWith('sk-ant')){alert('Enter your Anthropic API key for shared billing.');return;} const btn=document.getElementById('btn-create-ws'); btn.innerHTML='<div class="spin"></div>Creating...';btn.disabled=true; state.sharedApiKey=document.getElementById('shared-key').value; try{ const API='http://localhost:3001'; const ar=await fetch(API+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,email:state.email,password:state.password,industry:state.industry,accountType:'ceo',billingMode:state.workspaceBilling})}); const ad=await ar.json(); if(!ar.ok)throw new Error(ad.error); const wr=await fetch(API+'/workspaces',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ad.token},body:JSON.stringify({name,billingMode:state.workspaceBilling})}); const wd=await wr.json(); if(!wr.ok)throw new Error(wd.error); state.inviteCode=wd.workspace.inviteCode; state.wsId=wd.workspace.id; if(window.arie)await window.arie.onboard.complete({name:state.name,email:state.email,apiKey:state.workspaceBilling==='shared'?state.sharedApiKey:state.apiKey,industry:state.industry,accountType:'ceo',workspaceId:state.wsId,authToken:ad.token}); }catch(e){ state.inviteCode=Math.random().toString(36).substring(2,10).toUpperCase(); } document.getElementById('invite-code-display').textContent=state.inviteCode; btn.innerHTML='Create workspace';btn.disabled=false; showStep(7); }
+function copyCode(){ if(window.arie)window.arie.shell.copyText(state.inviteCode); else{navigator.clipboard.writeText(state.inviteCode).catch(()=>{}); document.querySelector('.code-hint').textContent='Copied!'; setTimeout(()=>document.querySelector('.code-hint').textContent='Click to copy',1500);} }
+async function launchApp(){
+  // Redeem referral code if provided and validated
+  if (state.referralCode && referralValidated && state.accountType !== 'staff') {
+    try {
+      // We need a token — in real flow this comes from registration. Store for post-login redemption.
+      localStorage.setItem('pending_referral', state.referralCode);
+    } catch {}
+  }
+  if(window.arie){ await window.arie.onboard.complete({name:state.name,email:state.email,password:state.password,apiKey:state.apiKey,industry:state.industry,accountType:state.accountType,billingMode:state.billingMode,wsCode:state.wsCode,referralCode:state.referralCode}); }else alert('Dev mode');
+}
+function checkPw(v){ const f=document.getElementById('pw-fill'),l=document.getElementById('pw-lbl'); if(!v){f.style.width='0';l.textContent='';return;} let s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[A-Z]/.test(v)&&/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++; const L=[{w:'20%',bg:'var(--rs)',t:'Too short'},{w:'40%',bg:'var(--gd)',t:'Weak'},{w:'65%',bg:'var(--gd)',t:'Fair'},{w:'85%',bg:'var(--gn)',t:'Good'},{w:'100%',bg:'var(--gn)',t:'Strong'}]; const lv=L[s]; f.style.width=lv.w;f.style.background=lv.bg;l.textContent=lv.t;l.style.color=lv.bg; }
+renderDots(1);
+</script>
+</body>
+</html>

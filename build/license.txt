@@ -1,0 +1,25 @@
+ARIE AI — END USER LICENSE AGREEMENT
+
+Copyright © 2025 Arie. All rights reserved.
+
+This software is proprietary and confidential. Unauthorised copying, distribution, 
+or modification is strictly prohibited.
+
+By installing Arie AI you agree to:
+
+1. Use the software only for lawful business purposes.
+2. Not reverse-engineer, decompile, or disassemble the software.
+3. Not distribute, sublicense, or resell the software without written permission.
+4. Maintain the confidentiality of your API keys and login credentials.
+
+AI USAGE AND BILLING
+This software connects to the Anthropic API using your personal API key. All AI 
+usage is billed directly by Anthropic to your account and is entirely separate 
+from your Arie subscription. Arie has no visibility into your 
+Anthropic account or usage.
+
+LIMITATION OF LIABILITY
+The software is provided "as is" without warranty of any kind. Arie 
+shall not be liable for any indirect, incidental, or consequential damages.
+
+For support: 71800@cgs.act.edu.au

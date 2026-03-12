@@ -1,0 +1,335 @@
+<!--
+  Arie AI — Admin: Staff Reports Dashboard
+  Embedded in the main app.html as a page panel.
+  Fetches encrypted reports, decrypts them client-side, renders charts and summaries.
+  Per-member tracking toggle controlled from here.
+-->
+
+<div id="page-reports" class="page" style="display:none">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Staff Reports</div>
+      <div class="page-sub">Daily task completion reports — end-to-end encrypted · visible to admin only</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <select id="reports-date-range" onchange="loadReports()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:7px;font-size:13px">
+        <option value="7">Last 7 days</option>
+        <option value="14">Last 14 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+      <button class="btn-sm" onclick="loadReports()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <!-- Tracking toggles per member -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title" style="margin-bottom:16px">Tracking settings</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+      Enable activity tracking per team member. When enabled, Arie AI monitors task completion against assigned tasks and compiles an encrypted daily report visible only to you.
+    </div>
+    <div id="tracking-toggles" style="display:flex;flex-direction:column;gap:10px">
+      <div style="color:var(--text-muted);font-size:13px">Loading team members...</div>
+    </div>
+  </div>
+
+  <!-- Report list -->
+  <div id="reports-grid" style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
+
+    <!-- Member selector -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Team members</div>
+      <div id="reports-member-list" style="padding:8px"></div>
+    </div>
+
+    <!-- Report detail -->
+    <div id="report-detail">
+      <div class="card" style="text-align:center;padding:48px 24px;color:var(--text-muted)">
+        <div style="font-size:32px;margin-bottom:12px">📊</div>
+        <div style="font-size:14px">Select a team member to view their reports</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Reports page state ─────────────────────────────────────────────
+let _selectedMemberId   = null;
+let _selectedMemberName = null;
+let _teamMembers        = [];
+let _memberPublicKeys   = {};  // userId -> signingPublicKey for verification
+
+// ── Load page ─────────────────────────────────────────────────────
+async function loadReportsPage() {
+  await loadTrackingToggles();
+  await loadMemberList();
+}
+
+// ── Tracking toggles ───────────────────────────────────────────────
+async function loadTrackingToggles() {
+  try {
+    const res  = await apiCall(`/api/workspaces/${currentUser.workspaceId}/members`);
+    _teamMembers = res.members || [];
+
+    const container = document.getElementById('tracking-toggles');
+    if (_teamMembers.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No team members in this workspace.</div>';
+      return;
+    }
+
+    container.innerHTML = _teamMembers.map(m => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface-2);border-radius:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;border-radius:7px;background:${m.avatarColor || 'linear-gradient(135deg,#1E54D4,#08B5CF)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:var(--font-head)">${initials(m.name)}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(m.name)}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${escHtml(m.role)}</div>
+          </div>
+        </div>
+        <label class="toggle-wrap" title="Enable activity tracking for ${escHtml(m.name)}">
+          <input type="checkbox" id="track-toggle-${m.id}" ${m.activityReportingEnabled ? 'checked' : ''}
+            onchange="setTrackingEnabled('${m.id}', this.checked, '${escHtml(m.name)}')">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('Failed to load tracking toggles:', err);
+  }
+}
+
+async function setTrackingEnabled(memberId, enabled, memberName) {
+  try {
+    await apiCall(`/api/workspaces/${currentUser.workspaceId}/members/${memberId}/tracking`, {
+      method: 'PATCH',
+      body: { activity_reporting_enabled: enabled },
+    });
+    showToast(`Activity tracking ${enabled ? 'enabled' : 'disabled'} for ${memberName}`);
+  } catch (err) {
+    showToast('Failed to update tracking setting', 'error');
+    // Revert toggle
+    const el = document.getElementById(`track-toggle-${memberId}`);
+    if (el) el.checked = !enabled;
+  }
+}
+
+// ── Member list ────────────────────────────────────────────────────
+async function loadMemberList() {
+  const list = document.getElementById('reports-member-list');
+  if (_teamMembers.length === 0) await loadTrackingToggles();
+
+  const tracked = _teamMembers.filter(m => m.activityReportingEnabled);
+
+  if (tracked.length === 0) {
+    list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text-muted)">No members with tracking enabled.</div>';
+    return;
+  }
+
+  list.innerHTML = tracked.map(m => `
+    <div class="member-report-item ${_selectedMemberId === m.id ? 'active' : ''}"
+         onclick="selectReportMember('${m.id}', '${escHtml(m.name)}')"
+         style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:7px;cursor:pointer;transition:background .15s">
+      <div style="width:28px;height:28px;border-radius:6px;background:${m.avatarColor || 'linear-gradient(135deg,#1E54D4,#08B5CF)'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;font-family:var(--font-head);flex-shrink:0">${initials(m.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(m.name)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function selectReportMember(memberId, memberName) {
+  _selectedMemberId   = memberId;
+  _selectedMemberName = memberName;
+
+  // Update active state
+  document.querySelectorAll('.member-report-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  await loadReports();
+}
+
+// ── Load and decrypt reports ───────────────────────────────────────
+async function loadReports() {
+  if (!_selectedMemberId) return;
+
+  const detail = document.getElementById('report-detail');
+  detail.innerHTML = '<div class="card" style="padding:24px;text-align:center;color:var(--text-muted)">Decrypting reports...</div>';
+
+  try {
+    const days = document.getElementById('reports-date-range')?.value || 7;
+    const to   = new Date().toISOString().slice(0, 10);
+    const from = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+
+    const res     = await apiCall(`/api/reports?workspace_id=${currentUser.workspaceId}&user_id=${_selectedMemberId}&from=${from}&to=${to}`);
+    const reports = res.reports || [];
+
+    if (reports.length === 0) {
+      detail.innerHTML = `<div class="card" style="padding:48px 24px;text-align:center;color:var(--text-muted)">
+        <div style="font-size:32px;margin-bottom:12px">📭</div>
+        <div>No reports found for ${escHtml(_selectedMemberName)} in this period.</div>
+      </div>`;
+      return;
+    }
+
+    // Decrypt reports client-side
+    const decrypted = [];
+    for (const report of reports) {
+      try {
+        const plaintext = await window.electronAPI.e2ee.decryptFromSender(
+          report.payload_encrypted,
+          report.sender_public_key
+        );
+        const data = JSON.parse(plaintext);
+
+        // Verify signature if present
+        let verified = null;
+        if (report.signature) {
+          const sigPubKey = await apiCall(`/api/keys/user/${report.user_id}`);
+          if (sigPubKey?.signingPublicKey) {
+            verified = await window.electronAPI.e2ee.verifyReport(
+              data, report.signature, sigPubKey.signingPublicKey
+            );
+          }
+        }
+
+        decrypted.push({ ...data, report_date: report.report_date, verified });
+      } catch (err) {
+        decrypted.push({ report_date: report.report_date, error: 'Decryption failed' });
+      }
+    }
+
+    renderReports(decrypted, _selectedMemberName);
+  } catch (err) {
+    detail.innerHTML = `<div class="card" style="padding:24px;color:var(--text-muted)">Failed to load reports: ${err.message}</div>`;
+  }
+}
+
+// ── Render decrypted reports ───────────────────────────────────────
+function renderReports(reports, memberName) {
+  const detail = document.getElementById('report-detail');
+
+  // Build activity chart data
+  const chartData = reports.map(r => ({
+    date: r.report_date,
+    hours: r.active_hours || 0,
+    tasks: (r.tasks_completed || []).length,
+  })).reverse();
+
+  const maxHours = Math.max(...chartData.map(d => d.hours), 1);
+
+  detail.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" style="margin-bottom:4px">${escHtml(memberName)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px">Last ${reports.length} report${reports.length !== 1 ? 's' : ''} · 🔐 Decrypted locally</div>
+
+      <!-- Activity chart -->
+      <div style="margin-bottom:8px;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">Active hours per day</div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:6px">
+        ${chartData.map(d => {
+          const pct = (d.hours / maxHours) * 100;
+          const isToday = d.date === new Date().toISOString().slice(0, 10);
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+            <div style="width:100%;background:rgba(30,111,212,.12);border-radius:4px 4px 0 0;height:${pct}%;border-top:2px solid ${isToday ? 'var(--accent)' : 'rgba(30,111,212,.4)'};min-height:3px"
+                 title="${d.date}: ${d.hours}h active, ${d.tasks} tasks"></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:6px">
+        ${chartData.map(d => `<div style="flex:1;font-size:9px;color:var(--text-muted);text-align:center;font-family:var(--font-mono)">${d.date.slice(5)}</div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Individual report cards -->
+    ${reports.map(r => renderReportCard(r)).join('')}
+  `;
+}
+
+function renderReportCard(report) {
+  if (report.error) {
+    return `<div class="card" style="margin-bottom:12px;border-left:3px solid var(--red-dim)">
+      <div style="font-size:12px;font-weight:600;color:var(--text)">${report.report_date}</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px">⚠️ ${report.error}</div>
+    </div>`;
+  }
+
+  const verified = report.verified === true ? '✓ Verified' : report.verified === false ? '⚠ Signature mismatch' : '';
+
+  return `
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${report.report_date}</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          ${verified ? `<span style="font-size:10px;color:${report.verified ? 'var(--green)' : 'var(--red)'};font-family:var(--font-mono)">${verified}</span>` : ''}
+          <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">🔐 E2EE</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="background:var(--surface-2);border-radius:7px;padding:10px 14px;flex:1;min-width:100px">
+          <div style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--text)">${report.active_hours ?? '—'}</div>
+          <div style="font-size:11px;color:var(--text-muted)">active hours</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:7px;padding:10px 14px;flex:1;min-width:100px">
+          <div style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--text)">${(report.tasks_completed || []).length}</div>
+          <div style="font-size:11px;color:var(--text-muted)">tasks completed</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:7px;padding:10px 14px;flex:1;min-width:100px">
+          <div style="font-family:var(--font-head);font-size:1.1rem;font-weight:800;color:var(--text)">${report.peak_hours ?? '—'}</div>
+          <div style="font-size:11px;color:var(--text-muted)">peak hours</div>
+        </div>
+      </div>
+
+      ${report.summary ? `<div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px">${escHtml(report.summary)}</div>` : ''}
+
+      ${(report.tasks_completed || []).length > 0 ? `
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Completed</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${report.tasks_completed.map(t => `
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text)">
+              <span style="color:var(--green);flex-shrink:0;margin-top:1px">✓</span>
+              ${escHtml(t)}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${(report.tasks_in_progress || []).length > 0 ? `
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-top:12px;margin-bottom:8px">In progress</div>
+        ${report.tasks_in_progress.map(t => `
+          <div style="display:flex;gap:8px;font-size:13px;color:var(--text-muted)">
+            <span style="color:var(--accent);flex-shrink:0">→</span>${escHtml(t)}
+          </div>
+        `).join('')}
+      ` : ''}
+    </div>
+  `;
+}
+
+// ── Helper: add per-member tracking toggle route ───────────────────
+// Called via PATCH /api/workspaces/:id/members/:userId/tracking
+// (This is an IPC trigger — the actual backend route handles it)
+</script>
+
+<style>
+.member-report-item:hover  { background: var(--surface-2) !important; }
+.member-report-item.active { background: rgba(30,111,212,.1) !important; }
+
+.toggle-wrap {
+  position: relative; display: inline-block;
+  width: 40px; height: 22px; cursor: pointer;
+}
+.toggle-wrap input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--border); border-radius: 22px;
+  transition: background .2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute; width: 16px; height: 16px;
+  left: 3px; top: 3px;
+  background: #fff; border-radius: 50%;
+  transition: transform .2s;
+}
+.toggle-wrap input:checked + .toggle-slider { background: var(--accent); }
+.toggle-wrap input:checked + .toggle-slider::before { transform: translateX(18px); }
+</style>
