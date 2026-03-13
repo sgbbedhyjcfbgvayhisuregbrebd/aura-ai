@@ -1,6 +1,6 @@
 {
   "name": "arie-ai",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Arie AI \u2014 Desktop Assistant for Consultants",
   "main": "src/main/index.js",
   "homepage": "https://arie.ai",
@@ -25,7 +25,7 @@
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
     "node-fetch": "^3.3.2",
-    "node-imap": "^0.9.6",
+    "node-imap": "^0.9.34",
     "imap-simple": "^5.1.0"
   },
   "devDependencies": {
