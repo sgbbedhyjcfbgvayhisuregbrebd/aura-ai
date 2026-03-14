@@ -10,15 +10,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm install
-
       - name: Build Windows
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -26,17 +23,28 @@ jobs:
 
   build-mac:
     runs-on: macos-latest
+    needs: build-windows
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm install
-
+      - name: Delete existing release assets
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPO: sgbbedhyjcfbgvayhisuregbrebd/arie-ai
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          RELEASE_ID=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/releases/tags/$TAG" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))")
+          if [ -n "$RELEASE_ID" ]; then
+            ASSETS=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/releases/$RELEASE_ID/assets" | python3 -c "import sys,json; [print(a['id']) for a in json.load(sys.stdin)]")
+            for ASSET_ID in $ASSETS; do
+              curl -s -X DELETE -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/releases/assets/$ASSET_ID"
+            done
+          fi
       - name: Build Mac
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
