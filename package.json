@@ -80,7 +80,6 @@
     },
     "dmg": {
       "title": "${productName} ${version}",
-      "background": "assets/dmg-bg.png",
       "icon": "assets/icon.icns",
       "iconSize": 100,
       "window": {
