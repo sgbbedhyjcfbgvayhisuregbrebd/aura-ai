@@ -1,6 +1,6 @@
 {
   "name": "arie-ai",
-  "version": "2.1.8",
+  "version": "2.1.9",
   "description": "Arie AI \u2014 Desktop Assistant for Consultants",
   "main": "src/main/index.js",
   "homepage": "https://arie.ai",
