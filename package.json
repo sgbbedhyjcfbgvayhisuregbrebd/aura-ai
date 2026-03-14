@@ -1,167 +1,20 @@
 {
-  "name": "arie-ai",
-  "version": "2.0.0",
-  "description": "Arie AI \u2014 Desktop Assistant for Consultants",
-  "main": "src/main/index.js",
-  "homepage": "https://arie.ai",
-  "author": {
-    "name": "Arie AI",
-    "email": "hello@arie.ai"
-  },
-  "license": "UNLICENSED",
-  "private": true,
+  "name": "claude-autonomous-task-system",
+  "version": "1.0.0",
+  "description": "Desktop app for autonomous task execution with Claude",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "NODE_ENV=development electron .",
-    "gen-icons": "node scripts/gen-icons.js",
-    "build:mac": "electron-builder --mac --arm64 --x64",
-    "build:win": "electron-builder --win --x64",
-    "build:all": "electron-builder --mac --win --arm64 --x64",
-    "build:mac:unsigned": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
-    "postinstall": "electron-builder install-app-deps"
+    "dev": "electron . --dev"
   },
+  "keywords": ["claude", "ai", "automation", "desktop"],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "electron-store": "^8.1.0",
-    "electron-updater": "^6.1.7",
-    "node-fetch": "^3.3.2",
-    "node-imap": "^0.9.0",
-    "imap-simple": "^5.1.0"
+    "@anthropic-ai/sdk": "^0.32.1",
+    "electron": "^28.0.0"
   },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0",
-    "png2icons": "^2.0.1",
-    "sharp": "^0.33.2"
-  },
-  "build": {
-    "appId": "ai.arie.app",
-    "productName": "Arie AI",
-    "copyright": "Copyright \u00a9 2025 Arie AI",
-    "files": [
-      "src/**/*",
-      "assets/**/*",
-      "!assets/icons/mac/icon.iconset/**",
-      "!**/*.map",
-      "!**/node_modules/.cache/**"
-    ],
-    "extraResources": [
-      {
-        "from": ".env",
-        "to": ".env",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "asar": true,
-    "asarUnpack": [
-      "**/node_modules/sharp/**",
-      "**/node_modules/@img/**"
-    ],
-    "mac": {
-      "appId": "ai.arie.app",
-      "category": "public.app-category.productivity",
-      "icon": "assets/icon.icns",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "notarize": false,
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        }
-      ]
-    },
-    "dmg": {
-      "title": "${productName} ${version}",
-      "background": "assets/dmg-bg.png",
-      "icon": "assets/icon.icns",
-      "iconSize": 100,
-      "window": {
-        "width": 540,
-        "height": 380
-      },
-      "contents": [
-        {
-          "x": 140,
-          "y": 200,
-          "type": "file"
-        },
-        {
-          "x": 400,
-          "y": 200,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "win": {
-      "appId": "ai.arie.app",
-      "icon": "assets/icon.ico",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "publisherName": "Arie AI",
-      "verifyUpdateCodeSignature": false
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "assets/icon.ico",
-      "uninstallerIcon": "assets/icon.ico",
-      "installerHeaderIcon": "assets/icon.ico",
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Arie AI",
-      "license": "build/license.txt"
-    },
-    "linux": {
-      "icon": "assets/icon.png",
-      "category": "Office",
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "sgbbedhyjcfbgvayhisuregbrebd",
-      "repo": "arie-ai",
-      "private": true
-    },
-    "afterSign": "scripts/notarize.js",
-    "protocols": [
-      {
-        "name": "arie-ai",
-        "schemes": [
-          "arie-ai"
-        ]
-      }
-    ]
+    "electron": "^28.0.0"
   }
 }
