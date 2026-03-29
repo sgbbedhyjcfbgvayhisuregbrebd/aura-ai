@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com">
-<title>Arie AI — Setup</title>
+<title>Renzo — Setup</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#050D18;--s1:#081629;--s2:#0B1C33;--s3:#0F2240;--a1:#1E54D4;--a2:#2E6BF7;--a3:#5B8FF9;--cy:#08B5CF;--gn:#0FA870;--rs:#E53565;--gd:#E09B1A;--tx:#C8D9ED;--d1:#6B84A0;--d2:#364E6A;--d3:#1D3248;--br:rgba(255,255,255,.055);--gl:rgba(255,255,255,.025);--fh:'Syne',sans-serif;--fb:'IBM Plex Sans',sans-serif}
@@ -87,7 +87,7 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
 
     <!-- STEP 1: Account -->
     <div class="step on" id="step-1">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-1"></div>
       <div class="card">
         <div class="card-title">Create your account</div>
@@ -101,11 +101,11 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
 
     <!-- STEP 2: Industry -->
     <div class="step" id="step-2">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-2"></div>
       <div class="card">
         <div class="card-title">What's your industry?</div>
-        <div class="card-sub">Arie AI adapts its language, triage rules, deadlines, and drafting style to your profession.</div>
+        <div class="card-sub">Renzo adapts its language, triage rules, deadlines, and drafting style to your profession.</div>
         <div class="ind-grid">
           <div class="ind-tile sel" data-ind="consulting" onclick="selIndustry(this)"><div class="ind-ic">🏛️</div><div><div class="ind-name">Consulting</div><div class="ind-sub">Government & commercial advisory</div></div></div>
           <div class="ind-tile" data-ind="legal" onclick="selIndustry(this)"><div class="ind-ic">⚖️</div><div><div class="ind-name">Legal</div><div class="ind-sub">Law firms, solicitors & in-house counsel</div></div></div>
@@ -113,16 +113,101 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
           <div class="ind-tile" data-ind="realestate" onclick="selIndustry(this)"><div class="ind-ic">🏠</div><div><div class="ind-name">Real Estate</div><div class="ind-sub">Sales, property management & advocacy</div></div></div>
         </div>
         <div class="ind-preview" id="ind-preview"></div>
-        <button class="btn-main" onclick="showStep(3)">Continue</button>
+        <!-- None of the above -->
+        <div style="text-align:center;margin:10px 0 4px">
+          <button onclick="showStep('2-custom')" style="background:none;border:none;color:var(--a3);font-size:11.5px;cursor:pointer;font-family:var(--fb);text-decoration:underline;text-underline-offset:3px">None of the above — tell Renzo about your role</button>
+        </div>
+        <button class="btn-main" onclick="showStep('2b')">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 2-CUSTOM: AI Interview ("None of the Above") -->
+    <div class="step" id="step-2-custom">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
+      <div class="dots" id="dots-2-custom"></div>
+      <div class="card">
+        <div class="card-title">Tell me about your role</div>
+        <div class="card-sub">Renzo will ask you a few questions and configure itself to match exactly how you work.</div>
+        <div id="custom-chat" style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin-bottom:12px;padding:2px">
+          <div class="custom-msg aura-msg" style="background:var(--gl);border:1px solid var(--br);border-radius:8px 8px 8px 2px;padding:9px 11px;font-size:12px;color:var(--d1);line-height:1.7">
+            👋 Hi! I'm <strong style="color:var(--tx)">The Architect</strong> — I'll configure Renzo around you.<br><br>
+            Let's start simple: <strong style="color:var(--tx)">What's your biggest daily win?</strong> (the task where you feel most productive)
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <input class="fi" id="custom-chat-input" placeholder="e.g. Closing deals, writing reports, managing staff..." style="flex:1;font-size:12px" onkeydown="if(event.key==='Enter')customChatSend()">
+          <button class="btn-main" style="width:auto;margin:0;padding:9px 16px" onclick="customChatSend()">→</button>
+        </div>
+        <div id="custom-chat-progress" style="display:none;margin-top:10px">
+          <div style="font-size:10px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px" id="custom-skin-label">Configuring your workspace...</div>
+          <div style="height:4px;background:var(--d3);border-radius:2px;overflow:hidden"><div id="custom-skin-bar" style="height:100%;background:linear-gradient(90deg,var(--a1),var(--cy));border-radius:2px;transition:width .5s ease;width:0%"></div></div>
+        </div>
+        <button class="btn-main" id="custom-done-btn" onclick="finishCustomSetup()" style="display:none;margin-top:12px">Continue with my custom setup →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2b: Shadow Mode Opt-In (NEW) -->
+    <div class="step" id="step-2b-shadow">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
+      <div class="dots" id="dots-2b-shadow"></div>
+      <div class="card">
+        <div class="card-title">Enable Shadow-Mode Learning?</div>
+        <div class="card-sub">Renzo can silently observe your workflow for 48 hours to identify repetitive patterns — and then offer to automate them for you.</div>
+        <div style="background:rgba(8,181,207,.06);border:1px solid rgba(8,181,207,.2);border-radius:10px;padding:13px 14px;margin-bottom:14px">
+          <div style="font-size:10.5px;font-weight:700;color:var(--cy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What Shadow Mode sees</div>
+          <div style="font-size:11.5px;color:var(--d1);line-height:1.7">✓ Window titles &amp; app switches &nbsp;·&nbsp; ✓ File open/close events &nbsp;·&nbsp; ✓ Repetitive sequences</div>
+        </div>
+        <div style="background:rgba(10,168,112,.06);border:1px solid rgba(10,168,112,.2);border-radius:10px;padding:13px 14px;margin-bottom:16px">
+          <div style="font-size:10.5px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What it never reads</div>
+          <div style="font-size:11.5px;color:var(--d1);line-height:1.7">✗ File contents &nbsp;·&nbsp; ✗ Email body text &nbsp;·&nbsp; ✗ Browser page content &nbsp;·&nbsp; ✗ Passwords</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:9px;background:var(--gl);border:1px solid var(--br);margin-bottom:16px;cursor:pointer" onclick="toggleShadowOptIn(this)">
+          <div id="shadow-optin-check" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--d2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:11px"></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--tx)">Enable Shadow-Mode Learning (48 Hours)</div><div style="font-size:11px;color:var(--d1);margin-top:1px">You can turn this off any time from Settings → Shadow Mode.</div></div>
+        </div>
+        <button class="btn-main" onclick="finishShadowOptIn()">Continue</button>
+      </div>
+    </div>
+
+
+    <!-- STEP 2b: Quick-Switch Tool Setup -->
+    <div class="step" id="step-2b">
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
+      <div class="dots" id="dots-2b"></div>
+      <div class="card">
+        <div class="card-title">Pick your tools</div>
+        <div class="card-sub">Based on your industry, we've suggested a starter set. Add, remove, or start fresh — you can always change these later.</div>
+
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+          <span class="ind-ic" id="qs-ind-icon">🏛️</span>
+          <span style="font-size:12.5px;font-weight:600;color:var(--tx)" id="qs-ind-name">Consulting</span>
+          <span style="font-size:11px;color:var(--d1);margin-left:2px">— recommended tools pre-selected</span>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="btn-main" style="padding:4px 10px;font-size:11px;width:auto;margin:0;background:var(--s2);border:1px solid var(--d3)" onclick="clearAllTools()">None of the above</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:8px;display:flex;gap:5px;align-items:center">
+          <input class="fi" id="qs-search" placeholder="Search tools..." oninput="filterQSTools(this.value)" style="flex:1;padding:6px 10px;font-size:12px">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto" id="qs-tool-grid"></div>
+
+        <div style="display:flex;align-items:center;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--d3)">
+          <span style="font-size:11px;color:var(--d1)"><span id="qs-count">5</span> tools selected</span>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="btn-main" style="width:auto;margin:0;padding:10px 20px" onclick="showStep(3)">Continue</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- STEP 3: Account type -->
     <div class="step" id="step-3">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-3"></div>
       <div class="card">
-        <div class="card-title">How will you use Arie AI?</div>
+        <div class="card-title">How will you use Renzo?</div>
         <div class="card-sub">This determines your billing and team setup.</div>
         <div class="opt-grid cols-3">
           <div class="opt-tile sel" data-type="solo" onclick="selAccountType(this)"><div class="ot-icon">🧑</div><div class="ot-label">Just me</div><div class="ot-sub">Individual, own billing</div></div>
@@ -147,16 +232,16 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
 
     <!-- STEP 4: Plan -->
     <div class="step" id="step-4">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-4"></div>
       <div class="card">
-        <div class="card-title">Arie AI plan</div>
+        <div class="card-title">Renzo plan</div>
         <div class="card-sub">$10/month per seat. Cancel any time.</div>
-        <div style="background:linear-gradient(135deg,rgba(30,84,212,.12),rgba(8,181,207,.07));border:1px solid rgba(46,107,247,.25);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden">
+        <div style="background:linear-gradient(135deg,rgba(30,84,212,.12),rgba(8,181,207,.07));border:1px solid rgba(46,107,247,.25);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden">
           <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a1),var(--cy))"></div>
           <div style="display:flex;justify-content:space-between;align-items:flex-start">
             <div><div style="font-family:var(--fh);font-size:15px;font-weight:800;color:#fff;margin-bottom:3px">Professional</div><div style="font-size:11px;color:var(--d1)">Everything included. No caps.</div></div>
-            <div style="text-align:right"><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:#fff">$10</div><div style="font-size:10px;color:var(--d1)">/month</div></div>
+            <div style="text-align:right"><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:#fff" id="plan-price-display">$10</div><div style="font-size:10px;color:var(--d1)">/month</div></div>
           </div>
           <div style="margin-top:14px;display:flex;flex-direction:column;gap:5px">
             <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>Email triage + AI drafts</div>
@@ -166,42 +251,80 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
             <div style="font-size:11.5px;color:var(--d1);display:flex;gap:7px"><span style="color:var(--gn)">✓</span>AI chat + cost tracking</div>
           </div>
         </div>
+
+        <!-- REFERRAL — shown BEFORE payment so discount applies -->
+        <div id="referral-section" style="margin-bottom:12px;padding:12px 13px;border-radius:10px;border:1.5px solid var(--d3);background:var(--gl)">
+          <div style="font-size:11px;font-weight:700;color:var(--tx);margin-bottom:6px">Have a referral code? Get your first month free.</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input id="referral-code-input" class="fi" style="font-size:12px;letter-spacing:2px;text-transform:uppercase;flex:1;padding:6px 10px" maxlength="8" placeholder="Enter code" oninput="validateReferralCode(this.value)">
+            <div id="referral-status" style="font-size:11px;min-width:56px;text-align:center"></div>
+          </div>
+          <div id="referral-message" style="font-size:11px;color:var(--gn);margin-top:5px;display:none"></div>
+        </div>
+
         <div class="info-box warn" style="margin-bottom:14px">
           <div class="ib-title">Two separate bills</div>
-          <div class="ib-body" id="billing-note-body">Arie AI charges $10/month for the platform. Anthropic charges you separately for AI usage.</div>
+          <div class="ib-body" id="billing-note-body">Renzo charges $10/month for the platform. Anthropic charges you separately for AI usage.</div>
         </div>
-        <button class="btn-main" id="btn-pay" onclick="processPlan()">Subscribe — $10/month</button>
-        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--d2)">Secured by Stripe. Cancel any time.</div>
+
+        <!-- Payment state machine: idle → pending → confirming → done -->
+        <div id="pay-idle">
+          <button class="btn-main" id="btn-pay" onclick="processPlan()">Subscribe — <span id="pay-price-label">$10</span>/month</button>
+          <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--d2)">Secured by Stripe. Cancel any time.</div>
+        </div>
+
+        <div id="pay-pending" style="display:none">
+          <div style="background:rgba(30,84,212,.07);border:1px solid rgba(46,107,247,.2);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--a3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Stripe opened in your browser</div>
+            <div style="font-size:12px;color:var(--d1);line-height:1.7">Complete your payment in the browser window, then click the button below. <strong style="color:var(--tx)">Do not close this app.</strong></div>
+          </div>
+          <button class="btn-main" onclick="confirmPayment()" id="btn-confirm-payment">I've completed payment →</button>
+          <button onclick="cancelPayment()" style="width:100%;margin-top:8px;background:none;border:none;color:var(--d2);font-size:11px;cursor:pointer;font-family:var(--fb);padding:4px">← Go back</button>
+        </div>
+
+        <div id="pay-confirming" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(30,84,212,.07);border:1px solid rgba(46,107,247,.2);border-radius:10px">
+            <div class="spin"></div>
+            <span style="font-size:12px;color:var(--d1)">Verifying payment with Stripe...</span>
+          </div>
+        </div>
+
+        <div id="pay-done" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(10,168,112,.08);border:1px solid rgba(10,168,112,.25);border-radius:10px">
+            <span style="font-size:18px">✓</span>
+            <span style="font-size:12.5px;color:#34D399;font-weight:600">Payment confirmed — continuing setup</span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- STEP 5: API key -->
     <div class="step" id="step-5">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-5"></div>
       <div class="card">
         <div class="card-title">Connect Claude</div>
-        <div class="card-sub">Arie AI uses your own Anthropic API key. AI costs go directly to your account — we never mark them up.</div>
+        <div class="card-sub">Renzo uses your own Anthropic API key. AI costs go directly to your account — we never mark them up.</div>
         <div class="sn-row open" id="sn1" onclick="toggleSN(1)"><div class="sn-num">1</div><div class="sn-body"><div class="sn-title">Create an Anthropic account</div><div class="sn-detail">Go to <a href="#" onclick="openExt('https://console.anthropic.com');return false" style="color:var(--a3)">console.anthropic.com</a> and sign up or log in.</div></div></div>
         <div class="sn-row" id="sn2" onclick="toggleSN(2)"><div class="sn-num">2</div><div class="sn-body"><div class="sn-title">Add a credit card or buy credits</div><div class="sn-detail">Go to Billing and add a payment method. You need at least $5 of credit to start.</div></div></div>
-        <div class="sn-row" id="sn3" onclick="toggleSN(3)"><div class="sn-num">3</div><div class="sn-body"><div class="sn-title">Create an API key</div><div class="sn-detail">Go to API Keys and create a key. Name it "Arie AI". It starts with <strong style="color:var(--tx)">sk-ant-api03-</strong> — copy it immediately.</div></div></div>
+        <div class="sn-row" id="sn3" onclick="toggleSN(3)"><div class="sn-num">3</div><div class="sn-body"><div class="sn-title">Create an API key</div><div class="sn-detail">Go to API Keys and create a key. Name it "Renzo". It starts with <strong style="color:var(--tx)">sk-ant-api03-</strong> — copy it immediately.</div></div></div>
         <div class="sn-row" id="sn4" onclick="toggleSN(4)"><div class="sn-num">4</div><div class="sn-body"><div class="sn-title">Set a monthly spend limit</div><div class="sn-detail">Go to Billing → Usage limits. $20–30 is plenty for most users. Prevents unexpected charges.</div></div></div>
         <div class="divider">paste your key below</div>
         <div class="key-wrap"><input class="key-input" id="api-key" type="password" placeholder="sk-ant-api03-..." oninput="onKeyInput(this.value)"><button class="key-toggle" onclick="toggleKeyVis()">👁</button></div>
         <div class="key-status" id="key-status"></div>
         <button class="btn-main" id="btn-connect" onclick="validateKey()" disabled>Connect Claude</button>
-        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--d2)">Stored encrypted on your device. Never sent to Arie AI.</div>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--d2)">Stored encrypted on your device. Never sent to Renzo.</div>
       </div>
     </div>
 
     <!-- STEP 6: CEO workspace setup -->
     <div class="step" id="step-6">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-6"></div>
       <div class="card">
         <div class="card-title">Create your workspace</div>
         <div class="card-sub">Your team joins using an invite code. Choose how AI costs are handled.</div>
-        <div class="fg"><label class="fl">Workspace name</label><input class="fi" id="ws-name" placeholder="e.g. Arie AI"></div>
+        <div class="fg"><label class="fl">Workspace name</label><input class="fi" id="ws-name" placeholder="e.g. Renzo"></div>
         <div class="fl" style="margin-bottom:8px">Team billing mode</div>
         <div class="opt-grid cols-2" style="margin-bottom:14px">
           <div class="opt-tile sel" data-billing="individual" onclick="selWorkspaceBilling(this)"><div class="ot-icon">💳</div><div class="ot-label">Individual</div><div class="ot-sub">Each person uses their own Anthropic key</div></div>
@@ -217,48 +340,35 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
 
     <!-- STEP 7: CEO invite code -->
     <div class="step" id="step-7">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-7"></div>
       <div class="card">
         <div class="success-icon">🔑</div>
         <div class="success-title">Workspace created</div>
-        <div class="success-sub">Share this code with your team. They enter it during their Arie AI setup.</div>
+        <div class="success-sub">Share this code with your team. They enter it during their Renzo setup.</div>
         <div class="code-box" onclick="copyCode()">
           <div class="code-val" id="invite-code-display">--------</div>
           <div class="code-hint">Click to copy</div>
         </div>
-        <div class="info-box" style="margin-bottom:16px"><div class="ib-title">What happens next</div><div class="ib-body">Staff enter this code when they set up Arie AI. You see them appear in your admin panel. Revoke access and regenerate codes any time from Settings.</div></div>
+        <div class="info-box" style="margin-bottom:16px"><div class="ib-title">What happens next</div><div class="ib-body">Staff enter this code when they set up Renzo. You see them appear in your admin panel. Revoke access and regenerate codes any time from Settings.</div></div>
         <div class="feats">
           <div class="feat"><div class="feat-ic">✓</div>Full team cost dashboard — per person and per feature</div>
           <div class="feat"><div class="feat-ic">✓</div>Activity tracking per team member (optional, E2EE)</div>
           <div class="feat"><div class="feat-ic">✓</div>Remove members and regenerate codes from Settings</div>
         </div>
-        <button class="btn-main" onclick="launchApp()">Open Arie AI</button>
+        <button class="btn-main" onclick="launchApp()">Open Renzo</button>
       </div>
     </div>
 
     <!-- STEP 8: Ready -->
     <div class="step" id="step-8">
-      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Arie AI</div></div>
+      <div class="logo"><div class="logo-mark"></div><div class="logo-name">Renzo</div></div>
       <div class="dots" id="dots-8"></div>
       <div class="card">
         <div class="success-icon">✓</div>
         <div class="success-title">You're all set</div>
-        <div class="success-sub">Arie AI is ready. Connect your email and calendar in the Connections page.</div>
+        <div class="success-sub">Renzo is ready. Connect your email and calendar in the Connections page.</div>
         <div class="info-box warn" id="cost-warning" style="margin-bottom:16px"><div class="ib-title">About AI costs</div><div class="ib-body">Every query uses Anthropic credits. Set a monthly limit at <a href="#" onclick="openExt('https://console.anthropic.com');return false" style="color:var(--a3)">console.anthropic.com</a> to stay in control.</div></div>
-
-        <!-- Referral section — hidden for staff accounts -->
-        <div id="referral-section" style="margin-bottom:16px;padding:14px;border-radius:10px;border:1.5px solid var(--d3);background:var(--s2)">
-          <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px">Did someone tell you about Arie?</div>
-          <div style="font-size:11px;color:var(--d1);margin-bottom:10px">If a colleague referred you, you'll both get your first month free.</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <div style="font-size:11px;color:var(--d1);white-space:nowrap">Have a referral code?</div>
-            <input id="referral-code-input" class="fi" style="font-size:12px;letter-spacing:2px;text-transform:uppercase;flex:1" maxlength="8" placeholder="XXXXXXXX" oninput="validateReferralCode(this.value)">
-            <div id="referral-status" style="font-size:11px;min-width:60px"></div>
-          </div>
-          <div id="referral-message" style="font-size:11px;color:var(--gn);margin-top:6px;display:none"></div>
-        </div>
-
         <div class="feats">
           <div class="feat"><div class="feat-ic">✓</div>Email triage — summarised and drafted automatically</div>
           <div class="feat"><div class="feat-ic">✓</div>Calendar intelligence — briefings and conflict detection</div>
@@ -267,14 +377,14 @@ html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx)
           <div class="feat"><div class="feat-ic">✓</div>Document chat — ask questions about any document</div>
           <div class="feat"><div class="feat-ic">✓</div>Template library — shared team templates</div>
         </div>
-        <button class="btn-main" onclick="launchApp()">Open Arie AI</button>
+        <button class="btn-main" onclick="launchApp()">Open Renzo</button>
       </div>
     </div>
 
   </div>
 </div>
 <script>
-const state = { name:'', email:'', password:'', industry:'consulting', accountType:'solo', billingMode:'individual', workspaceBilling:'individual', wsCode:'', wsId:null, apiKey:'', sharedApiKey:'', inviteCode:'', paymentDone:false, referralCode:'', masterAccess:false };
+const state = { name:'', email:'', password:'', industry:'consulting', accountType:'solo', billingMode:'individual', workspaceBilling:'individual', wsCode:'', wsId:null, apiKey:'', sharedApiKey:'', inviteCode:'', paymentDone:false, referralCode:'' };
 const FLOWS = { solo:[1,2,3,4,5,8], ceo:[1,2,3,4,5,6,7], staff_individual:[1,2,3,4,5,8], staff_shared:[1,2,3,4,8] };
 function flowKey(){ return state.accountType==='staff'&&state.billingMode==='shared'?'staff_shared':state.accountType==='staff'?'staff_individual':state.accountType; }
 function renderDots(id){ const flow=FLOWS[flowKey()]; const pos=flow.indexOf(id); const c=document.getElementById('dots-'+id); if(!c)return; c.innerHTML=flow.map((_,i)=>i<pos?'<div class="dot done"></div>':i===pos?'<div class="dot on"></div>':'<div class="dot"></div>').join(''); }
@@ -321,27 +431,136 @@ function updateReferralVisibility() {
 }
 function goStep2(){ const n=document.getElementById('f-name').value.trim(),e=document.getElementById('f-email').value.trim(),p=document.getElementById('f-pw').value; if(!n||p.length<8)return; if(!e.includes('@')||!e.includes('.')){document.getElementById('err-email').classList.add('on');return;} document.getElementById('err-email').classList.remove('on'); state.name=n;state.email=e;state.password=p; showStep(2); }
 const INDUSTRY_PREVIEWS = {
-  consulting: '🏛️ Arie will use consulting language (workstreams, deliverables, uplift), flag scope creep, prioritise government correspondence, and frame everything around risk, cost, and stakeholder impact.',
-  legal: '⚖️ Arie will use formal legal register, extract and calendar limitation dates and filing deadlines, preserve privilege markers, flag conflict checks for new client names, and draft precise billing narratives.',
-  finance: '📊 Arie will track ATO deadlines (BAS, IAS, STP, EOFY), flag Div 7A, CGT, GST, and SMSF issues, distinguish general information from personal advice, and use plain English for retail clients.',
-  realestate: '🏠 Arie will classify enquiries (buyer/seller/rental), extract settlement and cooling-off dates, write lifestyle-first listing copy, personalise buyer follow-ups, and flag maintenance requests for 24-hour response.',
+  consulting: '🏛️ Renzo will use consulting language (workstreams, deliverables, uplift), flag scope creep, prioritise government correspondence, and frame everything around risk, cost, and stakeholder impact.',
+  legal: '⚖️ Renzo will use formal legal register, extract and calendar limitation dates and filing deadlines, preserve privilege markers, flag conflict checks for new client names, and draft precise billing narratives.',
+  finance: '📊 Renzo will track ATO deadlines (BAS, IAS, STP, EOFY), flag Div 7A, CGT, GST, and SMSF issues, distinguish general information from personal advice, and use plain English for retail clients.',
+  realestate: '🏠 Renzo will classify enquiries (buyer/seller/rental), extract settlement and cooling-off dates, write lifestyle-first listing copy, personalise buyer follow-ups, and flag maintenance requests for 24-hour response.',
 };
 function selIndustry(el){ document.querySelectorAll('.ind-tile').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.industry=el.dataset.ind; const prev=document.getElementById('ind-preview'); if(prev){ prev.style.opacity='0'; setTimeout(()=>{prev.textContent=INDUSTRY_PREVIEWS[state.industry]||'';prev.style.opacity='1';},100); } }
 function selAccountType(el){ document.querySelectorAll('.opt-tile[data-type]').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.accountType=el.dataset.type; document.getElementById('staff-section').style.display=state.accountType==='staff'?'block':'none'; }
 function selBilling(el){ document.querySelectorAll('#staff-section .opt-tile[data-billing]').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.billingMode=el.dataset.billing; }
 let _cd=null;
 function onCodeInput(val){ const u=val.toUpperCase().replace(/[^A-Z0-9]/g,''); document.getElementById('ws-code').value=u; state.wsCode=u; document.getElementById('ws-preview').classList.remove('on'); clearTimeout(_cd); if(u.length===8)_cd=setTimeout(()=>validateWsCode(u),400); }
-async function validateWsCode(code){ try{ const r=await fetch('http://localhost:3001/workspaces/validate/'+code); const d=await r.json(); if(r.ok&&d.workspace){ document.getElementById('wp-name').textContent=d.workspace.name; document.getElementById('wp-meta').textContent='Managed by '+(d.workspace.ceoName||'your admin')+' · '+(d.workspace.billingMode==='shared'?'Company pays AI costs':'Individual billing'); document.getElementById('ws-preview').classList.add('on'); if(d.workspace.billingMode==='shared'){state.billingMode='shared';document.querySelectorAll('#staff-section .opt-tile[data-billing="shared"]').forEach(t=>{t.click();});} }}catch{} }
-async function goStep4(){ if(state.accountType==='staff'&&state.wsCode.length!==8){alert('Enter your 8-character invite code.');return;} if(state.accountType==='staff'&&state.billingMode==='shared')document.getElementById('billing-note-body').textContent='Your team admin covers AI costs. You just pay the $10/month Arie AI seat fee.'; showStep(4); }
-function processPlan(){ const btn=document.getElementById('btn-pay'); btn.innerHTML='<div class="spin"></div>Opening Stripe...'; btn.disabled=true; if(state.masterAccess){state.paymentDone=true;afterPayment();return;} const link='https://buy.stripe.com/5kQ6oJdwPcmK3x16epd3i01'; if(window.arie){window.arie.shell.open(link); setTimeout(()=>{ if(!state.paymentDone){btn.innerHTML="I've completed payment";btn.disabled=false;btn.onclick=()=>{ state.paymentDone=true;afterPayment(); };} },10000); window.arie.onPaymentComplete(()=>{ state.paymentDone=true;afterPayment(); }); }else{ setTimeout(()=>{ state.paymentDone=true; btn.innerHTML='Subscribe — $10/month'; btn.disabled=false; afterPayment(); },1000); } }
-function afterPayment(){ if(state.accountType==='staff'&&state.billingMode==='shared')showStep(8); else showStep(5); }
+async function validateWsCode(code){ try{ const r=await fetch('http://localhost:3001/api/workspaces/validate/'+code); const d=await r.json(); if(r.ok&&d.workspace){ document.getElementById('wp-name').textContent=d.workspace.name; document.getElementById('wp-meta').textContent='Managed by '+(d.workspace.ceoName||'your admin')+' · '+(d.workspace.billingMode==='shared'?'Company pays AI costs':'Individual billing'); document.getElementById('ws-preview').classList.add('on'); if(d.workspace.billingMode==='shared'){state.billingMode='shared';document.querySelectorAll('#staff-section .opt-tile[data-billing="shared"]').forEach(t=>{t.click();});} }}catch{} }
+async function goStep4(){ if(state.accountType==='staff'&&state.wsCode.length!==8){alert('Enter your 8-character invite code.');return;} if(state.accountType==='staff'&&state.billingMode==='shared')document.getElementById('billing-note-body').textContent='Your team admin covers AI costs. You just pay the $10/month Renzo seat fee.'; showStep(4); }
+// ── Payment state machine — cannot be bypassed ────────────────
+// States: idle → pending → confirming → done
+// paymentDone is ONLY set to true after backend verification succeeds.
+// In dev mode it shows a clear DEV MODE banner and still requires a click.
+
+let paymentSessionId = null; // set by Stripe webhook / backend on success
+
+function setPayState(state) {
+  ['idle','pending','confirming','done'].forEach(s =>
+    document.getElementById('pay-' + s).style.display = s === state ? 'block' : 'none'
+  );
+}
+
+function processPlan() {
+  // Apply referral discount to display price if validated
+  const displayPrice = referralValidated ? 'FREE (1st month)' : '$10';
+  document.getElementById('pay-price-label').textContent = referralValidated ? 'FREE 1st month' : '$10';
+
+  // Build Stripe URL — append referral code as metadata if present
+  let stripeLink = 'https://buy.stripe.com/YOUR_STRIPE_LINK';
+  if (referralValidated && state.referralCode) {
+    stripeLink += '?client_reference_id=' + encodeURIComponent(state.referralCode + '_' + state.email);
+  }
+
+  if (window.arie) {
+    // Production: open real Stripe link
+    window.arie.shell.open(stripeLink);
+    // Listen for Stripe webhook callback via IPC
+    window.arie.onPaymentComplete((sessionId) => {
+      paymentSessionId = sessionId;
+      state.paymentDone = true;
+      setPayState('done');
+      setTimeout(afterPayment, 1200);
+    });
+    setPayState('pending');
+  } else {
+    // Dev/browser mode — show a clear banner, never auto-advance
+    setPayState('pending');
+    const btn = document.getElementById('btn-confirm-payment');
+    btn.innerHTML = '⚠️ DEV MODE — Click to simulate payment';
+    btn.style.background = 'linear-gradient(135deg,rgba(224,155,26,.3),rgba(224,155,26,.15))';
+    btn.style.border = '1px solid rgba(224,155,26,.4)';
+    btn.style.color = '#FCD34D';
+  }
+}
+
+async function confirmPayment() {
+  setPayState('confirming');
+
+  if (window.arie) {
+    // Production: verify with backend that Stripe actually completed
+    try {
+      const API = 'http://localhost:3001';
+      const res = await fetch(API + '/api/payment/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: state.email, sessionId: paymentSessionId })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.verified) {
+        setPayState('pending');
+        document.getElementById('btn-confirm-payment').innerHTML =
+          '⚠️ Payment not found yet — try again in a moment';
+        return;
+      }
+      state.paymentDone = true;
+    } catch {
+      // Backend unreachable — fall back to pending state with error
+      setPayState('pending');
+      document.getElementById('btn-confirm-payment').innerHTML =
+        '⚠️ Could not verify — check your connection and retry';
+      return;
+    }
+  } else {
+    // Dev mode only — explicit simulation, no auto-advance
+    await new Promise(r => setTimeout(r, 800));
+    state.paymentDone = true;
+  }
+
+  setPayState('done');
+  setTimeout(afterPayment, 1000);
+}
+
+function cancelPayment() {
+  setPayState('idle');
+  document.getElementById('btn-confirm-payment').innerHTML = "I've completed payment →";
+  document.getElementById('btn-confirm-payment').style.background = '';
+  document.getElementById('btn-confirm-payment').style.border = '';
+  document.getElementById('btn-confirm-payment').style.color = '';
+}
+
+function afterPayment() {
+  if(state.accountType==='staff' && state.billingMode==='shared') showStep(8);
+  else showStep(5);
+}
+
+// Update plan price label when referral is validated
+const _validateReferralOrig = validateReferralCode;
+validateReferralCode = function(val) {
+  _validateReferralOrig(val);
+  // Update price display after validation debounce
+  setTimeout(() => {
+    if (referralValidated) {
+      document.getElementById('pay-price-label').textContent = 'FREE 1st month';
+      document.getElementById('plan-price-display').textContent = '$0*';
+    } else {
+      document.getElementById('pay-price-label').textContent = '$10';
+      document.getElementById('plan-price-display').textContent = '$10';
+    }
+  }, 700);
+};
 function toggleSN(n){ document.querySelectorAll('.sn-row').forEach((r,i)=>r.classList.toggle('open',i+1===n)); }
 function openExt(url){ if(window.arie)window.arie.shell.open(url); else window.open(url,'_blank'); document.getElementById('sn1')&&document.getElementById('sn1').classList.add('done'); }
 function toggleKeyVis(){ const i=document.getElementById('api-key'); i.type=i.type==='password'?'text':'password'; }
 function onKeyInput(val){ const btn=document.getElementById('btn-connect'),inp=document.getElementById('api-key'),sts=document.getElementById('key-status'); inp.classList.remove('ok','bad'); if(!val){sts.innerHTML='';btn.disabled=true;return;} if(val.startsWith('sk-ant')){sts.innerHTML='<div class="ks-dot" style="background:var(--gd)"></div><span style="color:var(--d1)">Looks right — click Connect to verify</span>';btn.disabled=false;}else{sts.innerHTML='<div class="ks-dot" style="background:var(--rs)"></div><span style="color:var(--rs)">Should start with sk-ant-api03-</span>';inp.classList.add('bad');btn.disabled=true;} }
 async function validateKey(){ const key=document.getElementById('api-key').value.trim(),btn=document.getElementById('btn-connect'),sts=document.getElementById('key-status'),inp=document.getElementById('api-key'); btn.innerHTML='<div class="spin"></div>Verifying...';btn.disabled=true; if(window.arie){ const r=await window.arie.onboard.validateKey(key); if(r.valid){inp.classList.add('ok');sts.innerHTML='<div class="ks-dot" style="background:var(--gn)"></div><span style="color:var(--gn)">Valid — connected to Anthropic</span>';state.apiKey=key;btn.innerHTML='Connected ✓';setTimeout(()=>{ if(state.accountType==='ceo')showStep(6); else showStep(8); },800);}else{inp.classList.add('bad');sts.innerHTML='<div class="ks-dot" style="background:var(--rs)"></div><span style="color:var(--rs)">'+(r.error||'Invalid — check and try again')+'</span>';btn.innerHTML='Connect Claude';btn.disabled=false;} }else{ setTimeout(()=>{inp.classList.add('ok');sts.innerHTML='<div class="ks-dot" style="background:var(--gn)"></div><span style="color:var(--gn)">Connected (dev mode)</span>';state.apiKey=key;btn.innerHTML='Connected ✓';setTimeout(()=>{ if(state.accountType==='ceo')showStep(6); else showStep(8); },800);},1200); } }
 function selWorkspaceBilling(el){ document.querySelectorAll('#step-6 .opt-tile[data-billing]').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');state.workspaceBilling=el.dataset.billing;document.getElementById('shared-key-section').style.display=state.workspaceBilling==='shared'?'block':'none'; }
-async function createWorkspace(){ const name=document.getElementById('ws-name').value.trim(); if(!name){alert('Enter a workspace name.');return;} if(state.workspaceBilling==='shared'&&!document.getElementById('shared-key').value.startsWith('sk-ant')){alert('Enter your Anthropic API key for shared billing.');return;} const btn=document.getElementById('btn-create-ws'); btn.innerHTML='<div class="spin"></div>Creating...';btn.disabled=true; state.sharedApiKey=document.getElementById('shared-key').value; try{ const API='http://localhost:3001'; const ar=await fetch(API+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,email:state.email,password:state.password,industry:state.industry,accountType:'ceo',billingMode:state.workspaceBilling})}); const ad=await ar.json(); if(!ar.ok)throw new Error(ad.error); const wr=await fetch(API+'/workspaces',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ad.token},body:JSON.stringify({name,billingMode:state.workspaceBilling})}); const wd=await wr.json(); if(!wr.ok)throw new Error(wd.error); state.inviteCode=wd.workspace.inviteCode; state.wsId=wd.workspace.id; if(window.arie)await window.arie.onboard.complete({name:state.name,email:state.email,apiKey:state.workspaceBilling==='shared'?state.sharedApiKey:state.apiKey,industry:state.industry,accountType:'ceo',workspaceId:state.wsId,authToken:ad.token}); }catch(e){ state.inviteCode=Math.random().toString(36).substring(2,10).toUpperCase(); } document.getElementById('invite-code-display').textContent=state.inviteCode; btn.innerHTML='Create workspace';btn.disabled=false; showStep(7); }
+async function createWorkspace(){ const name=document.getElementById('ws-name').value.trim(); if(!name){alert('Enter a workspace name.');return;} if(state.workspaceBilling==='shared'&&!document.getElementById('shared-key').value.startsWith('sk-ant')){alert('Enter your Anthropic API key for shared billing.');return;} const btn=document.getElementById('btn-create-ws'); btn.innerHTML='<div class="spin"></div>Creating...';btn.disabled=true; state.sharedApiKey=document.getElementById('shared-key').value; try{ const API='http://localhost:3001'; const ar=await fetch(API+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:state.name,email:state.email,password:state.password,industry:state.industry,accountType:'ceo',billingMode:state.workspaceBilling})}); const ad=await ar.json(); if(!ar.ok)throw new Error(ad.error); const wr=await fetch(API+'/api/workspaces',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ad.token},body:JSON.stringify({name,billingMode:state.workspaceBilling})}); const wd=await wr.json(); if(!wr.ok)throw new Error(wd.error); state.inviteCode=wd.workspace.inviteCode; state.wsId=wd.workspace.id; if(window.arie)await window.arie.onboard.complete({name:state.name,email:state.email,apiKey:state.workspaceBilling==='shared'?state.sharedApiKey:state.apiKey,industry:state.industry,accountType:'ceo',workspaceId:state.wsId,authToken:ad.token}); }catch(e){ state.inviteCode=Math.random().toString(36).substring(2,10).toUpperCase(); } document.getElementById('invite-code-display').textContent=state.inviteCode; btn.innerHTML='Create workspace';btn.disabled=false; showStep(7); }
 function copyCode(){ if(window.arie)window.arie.shell.copyText(state.inviteCode); else{navigator.clipboard.writeText(state.inviteCode).catch(()=>{}); document.querySelector('.code-hint').textContent='Copied!'; setTimeout(()=>document.querySelector('.code-hint').textContent='Click to copy',1500);} }
 async function launchApp(){
   // Redeem referral code if provided and validated
@@ -355,9 +574,196 @@ async function launchApp(){
 }
 function checkPw(v){ const f=document.getElementById('pw-fill'),l=document.getElementById('pw-lbl'); if(!v){f.style.width='0';l.textContent='';return;} let s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[A-Z]/.test(v)&&/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++; const L=[{w:'20%',bg:'var(--rs)',t:'Too short'},{w:'40%',bg:'var(--gd)',t:'Weak'},{w:'65%',bg:'var(--gd)',t:'Fair'},{w:'85%',bg:'var(--gn)',t:'Good'},{w:'100%',bg:'var(--gn)',t:'Strong'}]; const lv=L[s]; f.style.width=lv.w;f.style.background=lv.bg;l.textContent=lv.t;l.style.color=lv.bg; }
 renderDots(1);
+
+// ── Custom Role Interview ("None of the Above") ───────────────
+const ARCHITECT_QUESTIONS = [
+  "What's your biggest daily win? (the task where you feel most productive)",
+  "What's your biggest daily bottleneck? (the thing that slows you down most)",
+  "In one sentence — what does success look like at the end of your workday?",
+];
+let customStep = 0;
+let customAnswers = [];
+let customSkinName = '';
+
+function appendCustomMsg(text, isUser) {
+  const chat = document.getElementById('custom-chat');
+  const div = document.createElement('div');
+  div.style.cssText = isUser
+    ? 'background:var(--a1);color:#fff;border-radius:8px 8px 2px 8px;padding:9px 11px;font-size:12px;align-self:flex-end;max-width:85%;line-height:1.7;margin-left:auto'
+    : 'background:var(--gl);border:1px solid var(--br);border-radius:8px 8px 8px 2px;padding:9px 11px;font-size:12px;color:var(--d1);line-height:1.7';
+  div.innerHTML = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function inferSkin(answers) {
+  const joined = answers.join(' ').toLowerCase();
+  if (joined.includes('sign') || joined.includes('contract') || joined.includes('closing')) return { name:'Contract Tracker', icon:'✍️', ind:'realestate' };
+  if (joined.includes('code') || joined.includes('deploy') || joined.includes('bug')) return { name:'Dev Ops Monitor', icon:'💻', ind:'consulting' };
+  if (joined.includes('invoice') || joined.includes('billing') || joined.includes('tax')) return { name:'Revenue Guard', icon:'💰', ind:'finance' };
+  if (joined.includes('client') || joined.includes('meeting') || joined.includes('project')) return { name:'Account Navigator', icon:'🗂', ind:'consulting' };
+  if (joined.includes('legal') || joined.includes('brief') || joined.includes('court')) return { name:'Matter Tracker', icon:'⚖️', ind:'legal' };
+  return { name:'Workflow Commander', icon:'⚡', ind:'consulting' };
+}
+
+async function customChatSend() {
+  const inp = document.getElementById('custom-chat-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+
+  appendCustomMsg(val, true);
+  customAnswers.push(val);
+  customStep++;
+
+  await new Promise(r => setTimeout(r, 400));
+
+  if (customStep < ARCHITECT_QUESTIONS.length) {
+    let response = ARCHITECT_QUESTIONS[customStep];
+    // Try Claude if available
+    if (window.arie && customStep === 1) {
+      try {
+        const r = await window.arie.claude.chat(
+          [{ role:'user', content: `User's daily win: "${customAnswers[0]}". Ask about their biggest daily bottleneck in a conversational, empathetic way. Keep it under 20 words.` }],
+          'You are The Architect, a friendly AI onboarding assistant. Ask exactly one follow-up question. Be warm and brief.'
+        );
+        if (!r.error) response = r.text;
+      } catch {}
+    }
+    appendCustomMsg(`<strong style="color:var(--tx)">The Architect:</strong> ${response}`, false);
+  } else {
+    // Analysis complete
+    const skin = inferSkin(customAnswers);
+    customSkinName = skin.name;
+    state.industry = skin.ind;
+
+    appendCustomMsg(`<strong style="color:var(--cy)">Configuring your workspace...</strong><br>Based on your answers, I'm setting Renzo up as your <strong style="color:#fff">${skin.icon} ${skin.name}</strong>.`, false);
+
+    // Show progress bar
+    const prog = document.getElementById('custom-chat-progress');
+    const label = document.getElementById('custom-skin-label');
+    const bar = document.getElementById('custom-skin-bar');
+    prog.style.display = 'block';
+    label.textContent = `${skin.icon} Configuring as "${skin.name}"...`;
+
+    let pct = 0;
+    const interval = setInterval(() => {
+      pct = Math.min(pct + 4, 100);
+      bar.style.width = pct + '%';
+      if (pct >= 100) {
+        clearInterval(interval);
+        label.textContent = `✓ Renzo is now your ${skin.icon} ${skin.name}`;
+        label.style.color = 'var(--gn)';
+        document.getElementById('custom-done-btn').style.display = 'block';
+      }
+    }, 60);
+
+    inp.disabled = true;
+    document.querySelector('#step-2-custom .btn-main:last-of-type').style.display = 'none';
+  }
+}
+
+function finishCustomSetup() {
+  showStep('2b');
+}
+
+// ── Shadow Mode Opt-In ────────────────────────────────────────
+let shadowOptInEnabled = false;
+
+function toggleShadowOptIn(row) {
+  shadowOptInEnabled = !shadowOptInEnabled;
+  const check = document.getElementById('shadow-optin-check');
+  if (shadowOptInEnabled) {
+    check.textContent = '✓';
+    check.style.background = 'var(--cy)';
+    check.style.borderColor = 'var(--cy)';
+    check.style.color = '#fff';
+    row.style.borderColor = 'rgba(8,181,207,.35)';
+    row.style.background = 'rgba(8,181,207,.06)';
+  } else {
+    check.textContent = '';
+    check.style.background = '';
+    check.style.borderColor = 'var(--d2)';
+    check.style.color = '';
+    row.style.borderColor = 'var(--br)';
+    row.style.background = 'var(--gl)';
+  }
+}
+
+function finishShadowOptIn() {
+  state.shadowMode = shadowOptInEnabled;
+  // Route: shadow opt-in → tool picker → step 3
+  // Show the tool picker step directly
+  _showStepOrig('2b');
+  renderQSTools && renderQSTools();
+}
+
+// Wire up step routing and initial renders
+document.addEventListener('DOMContentLoaded', () => {
+  // Step 2 "Continue" → Shadow opt-in
+  const btn2 = document.querySelector('#step-2 .btn-main:last-of-type');
+  if (btn2) btn2.onclick = () => showStep('2b-shadow');
+  // Step 2-custom done → Shadow opt-in
+  const btnCustom = document.getElementById('custom-done-btn');
+  if (btnCustom) btnCustom.onclick = () => showStep('2b-shadow');
+  const prev = document.getElementById('ind-preview');
+  if (prev) prev.textContent = INDUSTRY_PREVIEWS['consulting'];
+  renderQSTools && renderQSTools();
+});
+const QS_ALL_TOOLS = [
+  { id:'inbox',     ic:'✉',  label:'Email Triage',        desc:'Summarise & draft replies',    recommended:['consulting','legal','finance','realestate'] },
+  { id:'calendar',  ic:'📅', label:'Calendar Intelligence',desc:'Briefings & conflict detection',recommended:['consulting','legal','finance','realestate'] },
+  { id:'nudge',     ic:'🔔', label:'Nudge',                desc:'Auto follow-up reminders',     recommended:['consulting','realestate'] },
+  { id:'privacy',   ic:'🛡', label:'Privacy Mask',         desc:'Blank sensitive data instantly',recommended:['finance','realestate','legal'] },
+  { id:'jargon',    ic:'🔤', label:'Jargon Translator',    desc:'Plain English ↔ expert',        recommended:['legal','finance','consulting'] },
+  { id:'bundle',    ic:'📦', label:'Bundle Builder',        desc:'Auto-collate project files',   recommended:['legal','realestate','consulting'] },
+  { id:'conflicts', ic:'⚡', label:'Conflict Checker',      desc:'Flag conflicts of interest',   recommended:['legal','finance'] },
+  { id:'safeshare', ic:'🔒', label:'Safe-Share Filter',     desc:'Catch internal notes before sending', recommended:['consulting','legal'] },
+];
+let qsSelected = new Set(['inbox','calendar','nudge','privacy','jargon','bundle','conflicts']);
+
+function renderQSTools(filter) {
+  const ind = document.querySelector('.ind-tile.sel')?.dataset.ind || 'consulting';
+  document.getElementById('qs-ind-icon').textContent = {consulting:'🏛️',legal:'⚖️',finance:'📊',realestate:'🏠'}[ind]||'🏛️';
+  document.getElementById('qs-ind-name').textContent = {consulting:'Consulting',legal:'Legal',finance:'Finance',realestate:'Real Estate'}[ind]||'Consulting';
+  const grid = document.getElementById('qs-tool-grid');
+  const f = (filter||'').toLowerCase();
+  const tools = QS_ALL_TOOLS.filter(t => !f || t.label.toLowerCase().includes(f) || t.desc.toLowerCase().includes(f));
+  grid.innerHTML = tools.map(t => {
+    const rec = t.recommended.includes(ind);
+    const sel = qsSelected.has(t.id);
+    return `<div onclick="toggleQSTool('${t.id}',this)" style="display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border-radius:9px;border:1.5px solid ${sel?'var(--a2)':'var(--d3)'};background:${sel?'rgba(30,84,212,.08)':'var(--s2)'};cursor:pointer;transition:all .15s">
+      <div style="font-size:16px;flex-shrink:0;margin-top:1px">${t.ic}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:5px">${t.label}${rec?'<span style="font-size:9px;padding:1px 5px;border-radius:8px;background:rgba(10,168,112,.1);color:#34D399;border:1px solid rgba(10,168,112,.2)">Rec</span>':''}</div>
+        <div style="font-size:10.5px;color:var(--d1);margin-top:2px">${t.desc}</div>
+      </div>
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid ${sel?'var(--a2)':'var(--d2)'};background:${sel?'var(--a1)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:#fff;margin-top:1px">${sel?'✓':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('qs-count').textContent = qsSelected.size;
+}
+
+function toggleQSTool(id, el) {
+  if (qsSelected.has(id)) qsSelected.delete(id); else qsSelected.add(id);
+  renderQSTools(document.getElementById('qs-search').value);
+}
+
+function clearAllTools() {
+  qsSelected.clear();
+  renderQSTools();
+}
+
+function filterQSTools(val) { renderQSTools(val); }
+
+// Override selIndustry to update QS recommended set
+const _selIndOrig = selIndustry;
+selIndustry = function(el) {
+  _selIndOrig(el);
+  const ind = el.dataset.ind;
+  qsSelected = new Set(QS_ALL_TOOLS.filter(t => t.recommended.includes(ind)).map(t => t.id));
+};
+
 </script>
 </body>
 </html>
-
-
-

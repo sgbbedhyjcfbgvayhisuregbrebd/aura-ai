@@ -11,7 +11,8 @@
 
 const { ipcMain } = require('electron');
 const Store       = require('electron-store');
-const e2ee        = require('../client-e2ee');
+// FIX: correct path — staffTracker is in app/services/, client-e2ee is in backend/client-e2ee/
+const e2ee        = require('../../backend/client-e2ee/index');
 
 const store = new Store({ name: 'activity-tracker' });
 
@@ -234,8 +235,8 @@ async function submitDailyReport(anthropicApiKey) {
     });
     const { tasks = [] } = tasksRes.ok ? await tasksRes.json() : {};
 
-    // AI assessment of task completion
-    const assessment = await assessTaskCompletion(_activityLog, tasks, anthropicApiKey);
+    // FIX: assessTaskCompletion(assignedTasks, activityLog, apiKey) — arguments were swapped
+    const assessment = await assessTaskCompletion(tasks, _activityLog, anthropicApiKey);
 
     const activeHours = calculateActiveHours(_activityLog);
     const peakHours   = calculatePeakHours(_activityLog);

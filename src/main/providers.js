@@ -1,10 +1,4 @@
-// node-fetch v3 is ESM-only — use dynamic import
-let _fetch;
-async function getFetch() {
-  if (!_fetch) { const mod = await import('node-fetch'); _fetch = mod.default; }
-  return _fetch;
-}
-async function fetch(...args) { const f = await getFetch(); return f(...args); }
+const fetch = require('node-fetch');
 
 // ── Microsoft token exchange ──────────────────────────────────
 async function exchangeMicrosoftCode(code, clientId, clientSecret, redirectUri) {

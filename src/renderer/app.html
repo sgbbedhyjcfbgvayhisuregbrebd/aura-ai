@@ -1,1960 +1,370 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com">
-<title>Arie AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#050D18;--s1:#081629;--s2:#0B1C33;--s3:#0F2240;--s4:#1A3358;--a1:#1E54D4;--a2:#2E6BF7;--a3:#5B8FF9;--cy:#08B5CF;--gn:#0FA870;--rs:#E53565;--gd:#E09B1A;--tx:#C8D9ED;--d1:#6B84A0;--d2:#364E6A;--d3:#1D3248;--br:rgba(255,255,255,0.055);--br2:rgba(255,255,255,0.10);--gl:rgba(255,255,255,0.025);--glh:rgba(255,255,255,0.05);--fh:'Syne',sans-serif;--fb:'IBM Plex Sans',sans-serif}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;overflow:hidden;user-select:none;-webkit-app-region:no-drag}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--d3);border-radius:2px}
-
-/* titlebar drag region */
-.titlebar{height:28px;-webkit-app-region:drag;background:var(--s1);border-bottom:1px solid var(--br);flex-shrink:0;display:flex;align-items:center;padding:0 80px 0 16px}
-.tb-name{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--d2);-webkit-app-region:no-drag}
-
-.layout{display:flex;flex-direction:column;height:100vh}
-.body{display:flex;flex:1;overflow:hidden}
-
-/* sidebar */
-.sb{width:220px;background:var(--s1);border-right:1px solid var(--br);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-.sb-grp{padding:4px 0}
-.sb-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--d2);padding:8px 14px 2px;font-weight:600}
-.ni{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;transition:all .12s;border-left:2px solid transparent;font-size:12px;color:var(--d1)}
-.ni:hover{background:var(--gl);color:var(--tx)}
-.ni.on{background:rgba(30,84,212,.09);border-left-color:var(--a2);color:var(--a2);font-weight:500}
-.ni-ic{width:15px;text-align:center;flex-shrink:0}
-.nb{font-size:9px;font-weight:700;padding:1px 5px;border-radius:9px;margin-left:auto}
-.nb-r{background:var(--rs);color:#fff}.nb-a{background:var(--gd);color:#fff}.nb-b{background:var(--a1);color:#fff}
-.sb-foot{margin-top:auto;padding:10px 14px;border-top:1px solid var(--br);display:flex;align-items:center;gap:8px}
-.sb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--cy));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:9px;flex-shrink:0;color:#fff}
-.sb-un{font-size:11.5px;font-weight:500}.sb-ur{font-size:10px;color:var(--cy)}
-.ai-live{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--d2);margin-top:1px}
-.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--gn);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(10,168,112,.6)}60%{box-shadow:0 0 0 4px rgba(10,168,112,0)}}
-
-/* main */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.pg-hdr{height:46px;border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;background:var(--s1)}
-.pg-title{font-family:var(--fh);font-size:13px;font-weight:700}
-.pg-r{margin-left:auto;display:flex;align-items:center;gap:7px}
-.content{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
-
-/* pages */
-.pg{display:none;flex-direction:column;gap:14px;animation:fadeUp .18s ease}
-.pg.on{display:flex}
-@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-
-/* cards */
-.card{background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:15px}
-.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
-.ct{font-family:var(--fh);font-size:12.5px;font-weight:700}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-.col-stack{display:flex;flex-direction:column;gap:12px}
-
-/* buttons */
-.btn{padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:500;cursor:pointer;border:none;font-family:var(--fb);transition:all .12s;display:inline-flex;align-items:center;gap:5px}
-.b-p{background:var(--a1);color:#fff}.b-p:hover{background:var(--a2)}
-.b-g{background:var(--gl);color:var(--d1);border:1px solid var(--br)}.b-g:hover{background:var(--glh);color:var(--tx)}
-.b-sm{padding:4px 9px;font-size:11px;border-radius:6px}
-.b-cy{background:rgba(8,181,207,.15);color:var(--cy);border:1px solid rgba(8,181,207,.25)}.b-cy:hover{background:rgba(8,181,207,.25)}
-
-/* tags */
-.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600}
-.t-g{background:rgba(10,168,112,.1);color:#34D399;border:1px solid rgba(10,168,112,.18)}
-.t-r{background:rgba(229,53,101,.1);color:#FB7185;border:1px solid rgba(229,53,101,.18)}
-.t-a{background:rgba(224,155,26,.12);color:#FCD34D;border:1px solid rgba(224,155,26,.2)}
-.t-b{background:rgba(30,84,212,.12);color:#93C5FD;border:1px solid rgba(30,84,212,.22)}
-.t-m{background:var(--gl);color:var(--d1);border:1px solid var(--br)}
-.cf{display:inline-flex;align-items:center;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px}
-.cf-h{background:rgba(10,168,112,.1);color:#34D399}.cf-m{background:rgba(224,155,26,.1);color:#FCD34D}.cf-l{background:rgba(229,53,101,.1);color:#FB7185}
-
-/* provider connect cards */
-.prov{display:flex;align-items:center;gap:12px;padding:14px;border-radius:10px;border:1px solid var(--br);background:var(--gl);margin-bottom:8px;transition:all .15s}
-.prov:hover{background:var(--glh)}
-.prov.connected{border-color:rgba(10,168,112,.3);background:rgba(10,168,112,.04)}
-.prov-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;font-weight:800;font-family:var(--fh)}
-.prov-b{flex:1}
-.prov-nm{font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:2px}
-.prov-det{font-size:11px;color:var(--d2);line-height:1.5}
-.prov-status{font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px;margin-top:3px}
-.ps-dot{width:5px;height:5px;border-radius:50%}
-
-/* email rows */
-.er{display:flex;align-items:flex-start;gap:9px;padding:10px;border-radius:8px;cursor:pointer;transition:all .12s;border:1px solid transparent}
-.er:hover{background:var(--gl);border-color:var(--br)}.er+.er{border-top:1px solid var(--br);margin-top:1px;border-radius:0}
-.er.active-email{background:rgba(30,84,212,.07);border-color:rgba(30,84,212,.25)!important;border-radius:8px}
-.e-pr{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.pr-hi{background:var(--rs)}.pr-md{background:var(--gd)}.pr-lo{background:var(--d2)}
-.e-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--fh);flex-shrink:0;color:#fff}
-.e-b{flex:1;min-width:0}
-.e-from{font-size:12px;font-weight:500;color:var(--tx)}
-.e-sub{font-size:11.5px;color:var(--d1)}
-.e-ai{font-size:10.5px;color:var(--a3);margin-top:2px;line-height:1.5}
-.e-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
-.e-time{font-size:10px;color:var(--d2)}
-
-/* calendar events */
-.ev{display:flex;gap:10px;align-items:flex-start;padding:9px 0}
-.ev+.ev{border-top:1px solid var(--br)}
-.ev-time{min-width:38px;text-align:right;flex-shrink:0}
-.ev-t{font-family:var(--fh);font-size:12px;font-weight:700}
-.ev-ap{font-size:9px;color:var(--d2)}
-.ev-spine{display:flex;flex-direction:column;align-items:center;padding-top:3px;flex-shrink:0}
-.ev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ev-line{width:1px;flex:1;background:var(--br2);margin-top:3px}
-.ev-info{flex:1}
-.ev-title{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:2px}
-.ev-det{font-size:10.5px;color:var(--d2)}
-.ev-acts{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
-.ev-src{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600}
-.ev-ms{background:rgba(0,120,212,.15);color:#60A5FA}
-.ev-gc{background:rgba(66,133,244,.15);color:#93C5FD}
-.ev-ap-badge{background:rgba(255,255,255,.08);color:var(--d1)}
-
-/* form */
-.fg{margin-bottom:12px}
-.fl{display:block;font-size:10px;font-weight:600;color:var(--d1);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.fi,.fsel,.fta{width:100%;background:var(--gl);border:1px solid var(--br);border-radius:7px;padding:7px 10px;color:var(--tx);font-family:var(--fb);font-size:12.5px;outline:none;transition:border-color .15s}
-.fi:focus,.fsel:focus,.fta:focus{border-color:rgba(30,84,212,.5)}
-.fi::placeholder,.fta::placeholder{color:var(--d2)}
-.fta{resize:none}
-
-/* draft panel */
-.draft-panel{background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:13px}
-.dp-lbl{font-size:9.5px;font-weight:700;color:#34D399;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
-.style-learned{background:rgba(10,168,112,.07);border:1px solid rgba(10,168,112,.2);border-radius:6px;padding:7px 9px;font-size:11px;color:#34D399;margin-top:8px;display:none}
-
-/* conflict banner */
-.conflict-banner{background:rgba(229,53,101,.07);border:1px solid rgba(229,53,101,.22);border-radius:8px;padding:10px 12px;margin-top:9px;display:none}
-.cb-title{font-size:9.5px;font-weight:700;color:#FB7185;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.cb-body{font-size:11.5px;color:var(--d1);line-height:1.6;margin-bottom:7px}
-
-/* AI panel */
-.aip{position:fixed;right:0;top:0;bottom:0;width:320px;background:var(--s1);border-left:1px solid var(--br);display:flex;flex-direction:column;z-index:100;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
-.aip.op{transform:none}
-.ai-h{padding:12px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
-.ai-ht{font-family:var(--fh);font-size:12.5px;font-weight:700}
-.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
-.am{display:flex;gap:6px;align-items:flex-start}.am.u{flex-direction:row-reverse}
-.am-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
-.am-av.b{background:linear-gradient(135deg,var(--a1),var(--cy))}.am-av.u{background:linear-gradient(135deg,var(--vi,#6E30D8),#EC4899);font-family:var(--fh);font-weight:700}
-.am-b{max-width:88%;padding:7px 10px;border-radius:8px;font-size:11.5px;line-height:1.6}
-.am.b .am-b{background:var(--gl);border:1px solid var(--br);border-top-left-radius:2px}
-.am.u .am-b{background:var(--a1);color:#fff;border-top-right-radius:2px}
-.conf-bar{display:flex;align-items:center;gap:5px;margin-top:4px;font-size:9px;color:var(--d1)}
-.conf-track{flex:1;height:2px;background:var(--br2);border-radius:1px;overflow:hidden}
-.conf-fill{height:100%;border-radius:1px;background:linear-gradient(90deg,var(--a1),var(--cy))}
-.ai-inp{padding:10px 11px;border-top:1px solid var(--br);display:flex;gap:6px;align-items:flex-end}
-.ai-ta{flex:1;background:var(--gl);border:1px solid var(--br);border-radius:6px;padding:6px 9px;color:var(--tx);font-family:var(--fb);font-size:12px;resize:none;height:32px;outline:none}
-.ai-ta:focus{border-color:rgba(30,84,212,.5)}.ai-ta::placeholder{color:var(--d2)}
-.ai-send{width:30px;height:30px;background:var(--a1);border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}.ai-send:hover{background:var(--a2)}
-
-/* connecting overlay */
-.connecting{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(30,84,212,.07);border:1px solid rgba(30,84,212,.2);border-radius:8px;font-size:12px;color:var(--d1);margin-top:8px;display:none}
-.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--a2);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* toggle */
-.tog{width:34px;height:17px;border-radius:9px;cursor:pointer;transition:background .2s;position:relative;border:none;flex-shrink:0}
-.tog.on{background:var(--a1)}.tog.off{background:var(--d3)}
-.tog-k{position:absolute;top:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .18s}
-.tog.on .tog-k{left:19px}.tog.off .tog-k{left:2px}
-
-/* update banner */
-#update-banner{display:none;background:linear-gradient(90deg,rgba(30,84,212,.15),rgba(8,181,207,.1));border-bottom:1px solid rgba(46,107,247,.25);padding:6px 16px;font-size:11.5px;color:var(--a3);align-items:center;gap:8px;-webkit-app-region:no-drag}
-#update-banner button{background:rgba(46,107,247,.2);border:1px solid rgba(46,107,247,.35);border-radius:5px;color:var(--a3);padding:3px 10px;font-size:11px;cursor:pointer;font-family:var(--fb)}
-#update-banner button:hover{background:rgba(46,107,247,.35)}
-
-.fb-type.on{background:rgba(46,107,247,.2)!important;color:var(--a3)!important;border:1px solid rgba(46,107,247,.35)!important}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src http://localhost:3001 https://api.anthropic.com;">
+  <title>Renzo AI</title>
+  <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<div class="layout">
 
-<!-- Titlebar (Mac traffic lights sit here) -->
-<div class="titlebar"><span class="tb-name">Arie AI</span></div>
-<div id="update-banner"><span id="update-msg"></span><button onclick="installUpdate()">Restart to update</button><button onclick="document.getElementById('update-banner').style.display='none'" style="background:none;border:none;color:var(--d2);margin-left:auto">✕</button></div>
+<!-- ── Auth screen ─────────────────────────────────────────────────────────── -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
 
-<div class="body">
-<!-- SIDEBAR -->
-<nav class="sb">
-  <div class="sb-grp">
-    <div class="sb-lbl">Overview</div>
-    <div class="ni on" id="ni-inbox" onclick="nav('inbox')"><div class="ni-ic">✉</div><span>Inbox</span><span class="nb nb-r" id="nb-inbox">5</span></div>
-    <div class="ni" id="ni-calendar" onclick="nav('calendar')"><div class="ni-ic">📅</div><span>Calendar</span><span class="nb nb-a">3</span></div>
-  </div>
-  <div class="sb-grp">
-    <div class="sb-lbl">Platform</div>
-    <div class="ni" id="ni-connect" onclick="nav('connect')"><div class="ni-ic">🔗</div><span>Connections</span></div>
-    <div class="ni" id="ni-costs" onclick="nav('costs')"><div class="ni-ic">💳</div><span>AI Costs</span></div>
-    <div class="ni" id="ni-reports" onclick="nav('reports')" style="display:none"><div class="ni-ic">📊</div><span>Staff Reports</span></div>
-    <div class="ni" id="ni-settings" onclick="nav('settings')"><div class="ni-ic">⚙</div><span>Settings</span></div>
-    <div class="ni" id="ni-feedback" onclick="nav('feedback')"><div class="ni-ic">💬</div><span>Feedback</span></div>
-  </div>
-  <div class="sb-foot">
-    <div class="sb-av" id="sb-av">AH</div>
-    <div>
-      <div class="sb-un" id="sb-name">Loading...</div>
-      <div class="sb-ur">Arie AI</div>
-      <div class="ai-live"><div class="ai-dot"></div>Claude active</div>
+    <!-- Logo -->
+    <div class="auth-logo-wrap">
+      <img src="logo.png" class="auth-logo-img" alt="Renzo AI">
     </div>
-  </div>
-</nav>
 
-<!-- MAIN -->
-<div class="main">
-<div class="pg-hdr">
-  <div class="pg-title" id="pg-title">Inbox</div>
-  <div class="pg-r">
-    <button class="btn b-g b-sm" onclick="toggleAI()">Ask Claude</button>
-    <button class="btn b-p b-sm" id="pg-cta">Compose</button>
+    <div id="auth-error" class="auth-error" style="display:none"></div>
+
+    <!-- ── Sign In ── -->
+    <div id="form-login">
+      <div class="auth-tagline">Welcome back</div>
+      <input type="email"    id="login-email"    class="input" placeholder="Email address">
+      <input type="password" id="login-password" class="input" placeholder="Password" style="margin-top:10px" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn-primary" style="margin-top:16px;width:100%" onclick="doLogin()">Sign in</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">
+        New to Renzo? <a href="#" onclick="showRegister()" style="color:var(--accent)">Create account</a>
+      </div>
+    </div>
+
+    <!-- ── Sign Up Wizard ── -->
+    <div id="form-register" style="display:none">
+
+      <!-- Step indicator -->
+      <div class="reg-steps" id="reg-step-dots"></div>
+
+      <!-- Step 1: Email -->
+      <div class="reg-step" id="reg-step-1">
+        <div class="reg-step-title">Get started</div>
+        <div class="reg-step-sub">Enter your work email to begin</div>
+        <input type="email" id="reg-email" class="input" placeholder="Work email address" style="margin-top:16px" onkeydown="if(event.key==='Enter')regNext()">
+        <button class="btn-primary" style="margin-top:14px;width:100%" onclick="regNext()">Continue →</button>
+      </div>
+
+      <!-- Step 2: Role picker -->
+      <div class="reg-step" id="reg-step-2" style="display:none">
+        <div class="reg-step-title">What's your role?</div>
+        <div class="reg-step-sub">This shapes your account and workspace</div>
+        <div class="role-cards" style="margin-top:18px">
+          <div class="role-card" id="role-solo" onclick="selectRole('solo')">
+            <div class="role-icon">👤</div>
+            <div class="role-name">Solo</div>
+            <div class="role-desc">Just me — independent professional</div>
+          </div>
+          <div class="role-card" id="role-ceo" onclick="selectRole('ceo')">
+            <div class="role-icon">🏢</div>
+            <div class="role-name">CEO / Owner</div>
+            <div class="role-desc">I run a team or firm</div>
+          </div>
+          <div class="role-card" id="role-staff" onclick="selectRole('staff')">
+            <div class="role-icon">👥</div>
+            <div class="role-name">Staff</div>
+            <div class="role-desc">I was invited by my employer</div>
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:18px;width:100%" onclick="regNext()">Continue →</button>
+      </div>
+
+      <!-- Step 3a: Staff → invite code -->
+      <div class="reg-step" id="reg-step-3-staff" style="display:none">
+        <div class="reg-step-title">Enter your invite code</div>
+        <div class="reg-step-sub">Ask your employer for their 8-digit staff code. They can find it in Settings → Team Access.</div>
+        <input type="text" id="reg-invite-code" class="input input-code" placeholder="e.g. 48291037" maxlength="8" style="margin-top:18px;letter-spacing:.2em;font-size:18px;text-align:center" onkeydown="if(event.key==='Enter')regNext()">
+        <div id="invite-check-msg" style="font-size:12px;margin-top:8px;min-height:18px"></div>
+        <button class="btn-primary" style="margin-top:12px;width:100%" onclick="regNext()">Verify code →</button>
+        <button class="btn-link" onclick="regBack()">← Back</button>
+      </div>
+
+      <!-- Step 3b: CEO/Solo → referral -->
+      <div class="reg-step" id="reg-step-3-owner" style="display:none">
+        <div class="reg-step-title">Referral code</div>
+        <div class="reg-step-sub">Have a referral code? Enter it to give your referrer a bonus. Skip if you don't have one.</div>
+        <input type="text" id="reg-referral-code" class="input" placeholder="Referral code (optional)" style="margin-top:18px;letter-spacing:.1em;text-align:center">
+        <button class="btn-primary" style="margin-top:14px;width:100%" onclick="regNext()">Continue →</button>
+        <button class="btn-link" onclick="regNext()">Skip →</button>
+        <button class="btn-link" onclick="regBack()">← Back</button>
+      </div>
+
+      <!-- Step 4: CEO/Solo → payment -->
+      <div class="reg-step" id="reg-step-4-payment" style="display:none">
+        <div class="reg-step-title">Renzo AI Sovereign</div>
+        <div class="reg-step-sub">Your all-in-one AI workspace for professional services</div>
+        <div class="payment-card" style="margin-top:18px">
+          <div class="payment-price"><span class="price-amt">$49</span><span class="price-per">/month</span></div>
+          <ul class="payment-features">
+            <li>✓ Unlimited AI requests (Claude)</li>
+            <li>✓ Full v4 Sovereign feature suite</li>
+            <li>✓ Social Ghost browser extension</li>
+            <li>✓ A2A logic network access</li>
+            <li>✓ Invite unlimited staff members</li>
+            <li>✓ Priority support</li>
+          </ul>
+          <div class="payment-note">Billing is handled securely. Cancel any time.</div>
+        </div>
+        <button class="btn-primary" style="margin-top:16px;width:100%" onclick="regNext()">Confirm plan & continue →</button>
+        <button class="btn-link" onclick="regBack()">← Back</button>
+      </div>
+
+      <!-- Step 5: Name + password (all roles) -->
+      <div class="reg-step" id="reg-step-5" style="display:none">
+        <div class="reg-step-title">Create your account</div>
+        <div id="reg-company-field" style="margin-top:16px">
+          <input type="text" id="reg-company" class="input" placeholder="Company / workspace name">
+        </div>
+        <input type="text"     id="reg-name"     class="input" placeholder="Your full name" style="margin-top:10px">
+        <input type="password" id="reg-password" class="input" placeholder="Password (min 8 characters)" style="margin-top:10px" onkeydown="if(event.key==='Enter')doRegister()">
+        <button class="btn-primary" style="margin-top:16px;width:100%" onclick="doRegister()">Create account →</button>
+        <button class="btn-link" onclick="regBack()">← Back</button>
+      </div>
+
+    </div><!-- /form-register -->
+
+    <div id="auth-switch-link" style="display:none;text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">
+      Already have an account? <a href="#" onclick="showLogin()" style="color:var(--accent)">Sign in</a>
+    </div>
+
   </div>
 </div>
-<div class="content" id="content">
 
-<!-- ══ INBOX ══════════════════════════════════════════════════ -->
-<div class="pg on" id="pg-inbox">
-  <div style="display:grid;grid-template-columns:1fr 380px;gap:14px">
+<!-- ── App shell ───────────────────────────────────────────────────────────── -->
+<div id="app-shell" class="app-shell" style="display:none">
 
-    <!-- Email list -->
-    <div class="card" style="padding:12px">
-      <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button class="btn b-p b-sm" onclick="filterEmails('all')">All</button>
-        <button class="btn b-g b-sm" onclick="filterEmails('urgent')">Urgent</button>
-        <button class="btn b-g b-sm" onclick="filterEmails('question')">Questions</button>
-        <div style="margin-left:auto;display:flex;gap:5px" id="provider-filters">
-          <button class="btn b-sm" style="background:rgba(0,120,212,.1);color:#60A5FA;border:1px solid rgba(0,120,212,.2)" onclick="filterByProvider('microsoft')">Outlook</button>
-          <button class="btn b-sm" style="background:rgba(66,133,244,.1);color:#93C5FD;border:1px solid rgba(66,133,244,.2)" onclick="filterByProvider('google')">Gmail</button>
-          <button class="btn b-sm" style="background:rgba(255,255,255,.05);color:var(--d1);border:1px solid var(--br)" onclick="filterByProvider('apple')">Apple</button>
-        </div>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">Renzo</div>
+    <div class="sidebar-user" id="sidebar-user"></div>
+
+    <div class="nav-section-label">Workspace</div>
+    <div class="nav-item active" data-page="tasks"    onclick="navTo('tasks')">    <span class="nav-icon">☑</span> Tasks</div>
+    <div class="nav-item"        data-page="projects" onclick="navTo('projects')"> <span class="nav-icon">📁</span> Projects</div>
+    <div class="nav-item"        data-page="clients"  onclick="navTo('clients')">  <span class="nav-icon">👥</span> Clients</div>
+    <div class="nav-item"        data-page="prospects" onclick="navTo('prospects')"><span class="nav-icon">🎯</span> Prospects</div>
+
+    <div class="nav-section-label">AI</div>
+    <div class="nav-item" data-page="chat"      onclick="navTo('chat')">      <span class="nav-icon">💬</span> Chat</div>
+    <div class="nav-item" data-page="email"     onclick="navTo('email')">     <span class="nav-icon">📧</span> Email Intel</div>
+    <div class="nav-item" data-page="documents" onclick="navTo('documents')"> <span class="nav-icon">📄</span> Documents</div>
+    <div class="nav-item" data-page="briefings" onclick="navTo('briefings')"> <span class="nav-icon">📋</span> Briefings</div>
+
+    <div class="nav-section-label">Tools</div>
+    <div class="nav-item" data-page="templates"   onclick="navTo('templates')">   <span class="nav-icon">🗃</span> Templates</div>
+    <div class="nav-item" data-page="productivity" onclick="navTo('productivity')"><span class="nav-icon">🎯</span> Focus</div>
+    <div class="nav-item" data-page="team"        onclick="navTo('team')">        <span class="nav-icon">🤝</span> Team</div>
+    <div class="nav-item" data-page="reports"     onclick="navTo('reports')">     <span class="nav-icon">📊</span> Reports</div>
+
+    <div class="nav-section-label">Account</div>
+    <div class="nav-item" data-page="personas" onclick="navTo('personas')">  <span class="nav-icon">🎭</span> Personas</div>
+    <div class="nav-item" data-page="settings" onclick="navTo('settings')">  <span class="nav-icon">⚙</span> Settings</div>
+    <div class="nav-item" onclick="doLogout()"> <span class="nav-icon">⎋</span> Sign out</div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main-content" id="main-content">
+
+    <!-- Tasks page -->
+    <div id="page-tasks" class="page active">
+      <div class="page-header">
+        <div><div class="page-title">Tasks</div><div class="page-sub">Your work queue</div></div>
+        <button class="btn-sm" onclick="openAddTask()">+ New task</button>
       </div>
-
-      <!-- Not connected banner -->
-      <div id="not-connected-banner" style="background:rgba(30,84,212,.07);border:1px solid rgba(30,84,212,.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--d1);display:flex;align-items:center;gap:8px">
-        <span style="flex:1">Connect an email account to see your real inbox with AI triage.</span>
-        <button class="btn b-p b-sm" onclick="nav('connect')">Connect</button>
+      <div class="filter-bar">
+        <select id="task-filter-status" class="select-sm" onchange="loadTasks()">
+          <option value="">All</option><option value="pending">Pending</option>
+          <option value="in-progress">In progress</option><option value="complete">Done</option>
+        </select>
+        <select id="task-filter-assign" class="select-sm" onchange="loadTasks()">
+          <option value="">Everyone</option><option value="true">Mine only</option>
+        </select>
       </div>
+      <div id="task-list" class="task-list"></div>
+    </div>
 
-      <div id="email-list">
-        <div class="er" id="email-jm" onclick="openEmail('jm')">
-          <div class="e-pr pr-hi"></div>
-          <div class="e-av" style="background:linear-gradient(135deg,#6E30D8,#EC4899)">JM</div>
-          <div class="e-b">
-            <div class="e-from">James Mitchell — CASG</div>
-            <div class="e-sub">Re: Data Migration — Scope Change</div>
-            <div class="e-ai">Question — needs decision before Friday re: 3 new security requirements</div>
-          </div>
-          <div class="e-meta"><div class="e-time">9:14 AM</div><span class="cf cf-h">97%</span><span class="ev-src ev-ms">Outlook</span></div>
-        </div>
+    <!-- Projects page -->
+    <div id="page-projects" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Projects</div><div class="page-sub">Active engagements</div></div>
+        <button class="btn-sm" onclick="openAddProject()">+ New project</button>
+      </div>
+      <div id="project-list" class="card-grid"></div>
+    </div>
 
-        <div class="er" id="email-sr" onclick="openEmail('sr')">
-          <div class="e-pr pr-hi"></div>
-          <div class="e-av" style="background:linear-gradient(135deg,#047857,#10B981)">SR</div>
-          <div class="e-b">
-            <div class="e-from">Sarah R. — AIHW</div>
-            <div class="e-sub">Contract renewal — decision needed COB</div>
-            <div class="e-ai">Question — confirm 12-month extension by close of business today</div>
-          </div>
-          <div class="e-meta"><div class="e-time">8:42 AM</div><span class="cf cf-h">94%</span><span class="ev-src ev-ms">Outlook</span></div>
-        </div>
+    <!-- Clients page -->
+    <div id="page-clients" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Clients</div><div class="page-sub">Client relationships & memory</div></div>
+        <button class="btn-sm" onclick="openAddClient()">+ New client</button>
+      </div>
+      <div id="client-list" class="card-grid"></div>
+    </div>
 
-        <div class="er" id="email-tk" onclick="openEmail('tk')">
-          <div class="e-pr pr-md"></div>
-          <div class="e-av" style="background:linear-gradient(135deg,#B45309,#F59E0B)">TK</div>
-          <div class="e-b">
-            <div class="e-from">Tom K. — Internal</div>
-            <div class="e-sub">NLA proposal — Sections 3 &amp; 4 ready</div>
-            <div class="e-ai">Statement — pricing done, requesting your sign-off on resource assumptions</div>
-          </div>
-          <div class="e-meta"><div class="e-time">Yesterday</div><span class="cf cf-m">78%</span><span class="ev-src ev-gc">Gmail</span></div>
-        </div>
-
-        <div class="er" id="email-ps" onclick="openEmail('ps')">
-          <div class="e-pr pr-md"></div>
-          <div class="e-av" style="background:linear-gradient(135deg,#0A9488,#2DD4BF)">PS</div>
-          <div class="e-b">
-            <div class="e-from">Priya S. — Internal</div>
-            <div class="e-sub">SGW risk register — 2 new items</div>
-            <div class="e-ai">Statement — vendor dependency and stakeholder availability risks added, FYI only</div>
-          </div>
-          <div class="e-meta"><div class="e-time">Yesterday</div><span class="cf cf-m">82%</span><span class="ev-src ev-ap-badge">Apple</span></div>
-        </div>
+    <!-- Chat page -->
+    <div id="page-chat" class="page">
+      <div class="page-header"><div class="page-title">Arie AI Chat</div></div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-bar">
+        <textarea id="chat-input" class="chat-textarea" placeholder="Ask Arie anything…" rows="1" onkeydown="chatKeydown(event)"></textarea>
+        <button class="btn-primary" onclick="sendChat()">Send</button>
       </div>
     </div>
 
-    <!-- Email detail + draft -->
-    <div class="col-stack">
-      <div id="email-empty" class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center">
-        <div style="font-size:28px;margin-bottom:10px;opacity:.3">✉</div>
-        <div style="font-family:var(--fh);font-size:12.5px;font-weight:700;margin-bottom:5px">Select an email</div>
-        <div style="font-size:11.5px;color:var(--d2);line-height:1.6">Claude summarises each email and drafts a reply in your writing style. Edits you make are learned automatically.</div>
+    <!-- Email Intel page -->
+    <div id="page-email" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Email Intelligence</div><div class="page-sub">Triage & draft replies with AI</div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Paste emails to triage</div>
+        <textarea id="email-input" class="input" rows="8" placeholder="Paste one or more emails here…" style="margin-top:10px;font-family:monospace;font-size:12px"></textarea>
+        <button class="btn-sm" style="margin-top:10px" onclick="triageEmails()">Analyse with AI →</button>
+      </div>
+      <div id="triage-results"></div>
+    </div>
+
+    <!-- Documents page -->
+    <div id="page-documents" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Documents</div><div class="page-sub">Summarise, chat, and compare</div></div>
+        <button class="btn-sm" onclick="uploadDocument()">↑ Upload</button>
+      </div>
+      <div id="doc-list" class="card-grid"></div>
+    </div>
+
+    <!-- Briefings page -->
+    <div id="page-briefings" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Meeting Briefings</div><div class="page-sub">AI-generated pre-meeting intelligence</div></div>
+        <button class="btn-sm" onclick="openAddBriefing()">+ Generate briefing</button>
+      </div>
+      <div id="briefing-list"></div>
+    </div>
+
+    <!-- Templates page -->
+    <div id="page-templates" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Template Library</div><div class="page-sub">Email & document templates</div></div>
+        <button class="btn-sm" onclick="openAddTemplate()">+ New template</button>
+      </div>
+      <div id="template-list" class="card-grid"></div>
+    </div>
+
+    <!-- Productivity / Focus page -->
+    <div id="page-productivity" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Focus & Productivity</div><div class="page-sub">Daily focus, debrief, weekly review</div></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <button class="btn-sm" onclick="getFocusPlan()">Get focus plan</button>
+        <button class="btn-sm" onclick="getDebrief()">End-of-day debrief</button>
+        <button class="btn-sm" onclick="getWeeklyReview()">Weekly review</button>
+      </div>
+      <div id="productivity-output" class="card" style="display:none"></div>
+    </div>
+
+    <!-- Team page -->
+    <div id="page-team" class="page">
+      <div class="page-header"><div class="page-title">Team</div><div class="page-sub">Teamwork & task delegation</div></div>
+      <div id="team-members" class="card-grid"></div>
+    </div>
+
+    <!-- Reports page (E2EE staff reports) — loaded from separate fragment -->
+    <div id="page-reports" class="page"></div>
+
+    <!-- Personas page -->
+    <div id="page-personas" class="page">
+      <div class="page-header">
+        <div><div class="page-title">AI Personas</div><div class="page-sub">Writing styles & communication profiles</div></div>
+        <button class="btn-sm" onclick="openAddPersona()">+ New persona</button>
+      </div>
+      <div id="persona-list" class="card-grid"></div>
+    </div>
+
+    <!-- Prospects page -->
+    <div id="page-prospects" class="page">
+      <div class="page-header">
+        <div><div class="page-title">Prospects</div><div class="page-sub">AI-powered lead pipeline</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm" onclick="openImportProspects()">↑ Import CSV</button>
+          <button class="btn-sm" onclick="openAddProspect()">+ Add lead</button>
+        </div>
       </div>
 
-      <div id="email-detail" style="display:none;flex-direction:column;gap:10px">
+      <!-- Pipeline stats -->
+      <div id="prospect-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px"></div>
+
+      <!-- Filters -->
+      <div class="filter-bar" style="margin-bottom:16px">
+        <select id="prospect-filter-status" class="select-sm" onchange="loadProspects()">
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="qualified">Qualified</option>
+          <option value="proposal">Proposal</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+        <select id="prospect-filter-grade" class="select-sm" onchange="loadProspects()">
+          <option value="">All grades</option>
+          <option value="A">A — Hot</option>
+          <option value="B">B — Warm</option>
+          <option value="C">C — Cool</option>
+          <option value="D">D — Cold</option>
+        </select>
+        <input class="input" id="prospect-search" placeholder="Search leads..." style="flex:1;max-width:240px;padding:6px 10px;font-size:13px" oninput="loadProspects()">
+      </div>
+
+      <!-- Lead list -->
+      <div id="prospect-list"></div>
+    </div>
+
+    <!-- Settings page -->
+    <div id="page-settings" class="page">
+      <div class="page-header"><div class="page-title">Settings</div></div>
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:480px">
+
         <div class="card">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
-            <div id="ed-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--fh);color:#fff;flex-shrink:0"></div>
-            <div style="flex:1">
-              <div id="ed-from" style="font-size:12px;font-weight:500;color:var(--tx)"></div>
-              <div id="ed-time" style="font-size:10px;color:var(--d2)"></div>
-            </div>
-            <div id="ed-type"></div>
-          </div>
-          <div id="ed-sub" style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:8px"></div>
-          <div id="ed-summary" style="font-size:12px;color:var(--d1);line-height:1.7;background:rgba(255,255,255,.02);border:1px solid var(--br);border-radius:7px;padding:9px 11px"></div>
-
-          <div class="conflict-banner" id="conflict-banner">
-            <div class="cb-title">Calendar conflict detected</div>
-            <div class="cb-body" id="conflict-msg"></div>
-            <div style="display:flex;gap:6px">
-              <button class="btn b-sm" style="background:rgba(229,53,101,.15);color:#FB7185;border:1px solid rgba(229,53,101,.3)" onclick="fixConflict()">Fix with Claude</button>
-              <button class="btn b-g b-sm" onclick="document.getElementById('conflict-banner').style.display='none'">Dismiss</button>
-            </div>
-          </div>
+          <div class="card-title" style="margin-bottom:14px">Account</div>
+          <div id="settings-user-info" style="font-size:13px;color:var(--text-muted)"></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+          <div class="card-title" style="margin-bottom:14px">Change password</div>
+          <input type="password" id="settings-cur-pass"  class="input" placeholder="Current password">
+          <input type="password" id="settings-new-pass"  class="input" placeholder="New password" style="margin-top:8px">
+          <button class="btn-sm" style="margin-top:12px" onclick="changePassword()">Update password</button>
+          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+          <div class="card-title" style="margin-bottom:14px">E2EE Keys</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Generate and register your end-to-end encryption key pair.</div>
+          <button class="btn-sm" onclick="generateE2EEKeys()">Generate & register keys</button>
         </div>
 
-        <div class="card" id="ed-instructions-card" style="display:none">
-          <div style="font-size:9.5px;font-weight:700;color:var(--a3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Your instructions</div>
-          <textarea class="fta" id="ed-instructions" style="height:52px;margin-bottom:8px" placeholder="e.g. Yes to the extension, but flag the rate review clause..."></textarea>
-          <button class="btn b-p b-sm" onclick="generateDraft()">Draft reply with Claude</button>
+        <!-- Team Access — only shown to Directors/CEO/Solo -->
+        <div class="card" id="invite-codes-card" style="display:none">
+          <div class="card-title" style="margin-bottom:6px">Team Access — Invite Codes</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Generate an 8-digit code to invite a new staff member. Each code can only be used once.</div>
+          <button class="btn-sm" onclick="generateStaffInviteCode()">+ Generate new code</button>
+          <div id="invite-code-result" style="margin-top:14px"></div>
+          <div id="invite-codes-history" style="margin-top:14px"></div>
         </div>
 
-        <div class="draft-panel" id="ed-draft" style="display:none">
-          <div class="dp-lbl">
-            <span>Draft reply — your style</span>
-            <span class="cf cf-h" id="ed-conf">—</span>
-          </div>
-          <textarea class="fta" id="ed-draft-text" style="height:120px;margin-bottom:9px" oninput="markEdited()"></textarea>
-          <div id="style-learned" class="style-learned"></div>
-          <div style="display:flex;gap:6px;margin-top:8px">
-            <button class="btn b-p b-sm">Send</button>
-            <button class="btn b-g b-sm" onclick="regenerate()">Regenerate</button>
-            <button class="btn b-g b-sm" id="learn-btn" onclick="learnStyle()" style="display:none">Save edits to style</button>
-          </div>
-        </div>
       </div>
     </div>
+
+  </main>
+</div>
+
+<!-- ── Modals ──────────────────────────────────────────────────────────────── -->
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header"><div class="modal-title" id="modal-title"></div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
 
-<!-- ══ CALENDAR ════════════════════════════════════════════════ -->
-<div class="pg" id="pg-calendar">
-  <div class="g21">
-    <div class="card">
-      <div class="ch">
-        <div class="ct">Today — March 11</div>
-        <div style="display:flex;gap:5px">
-          <span class="ev-src ev-ms">Outlook</span>
-          <span class="ev-src ev-gc">Google</span>
-          <span class="ev-src ev-ap-badge">Apple</span>
-          <button class="btn b-g b-sm">New event</button>
-        </div>
-      </div>
+<!-- ── Toast ───────────────────────────────────────────────────────────────── -->
+<div id="toast" class="toast" style="display:none"></div>
 
-      <div class="ev">
-        <div class="ev-time"><div class="ev-t">9:00</div><div class="ev-ap">AM</div></div>
-        <div class="ev-spine"><div class="ev-dot" style="background:var(--cy)"></div><div class="ev-line"></div></div>
-        <div class="ev-info">
-          <div class="ev-title">Daily Standup<span class="ev-src ev-ms" style="margin-left:6px">Outlook</span></div>
-          <div class="ev-det">Teams · All staff · 30 min</div>
-          <div class="ev-acts"><button class="btn b-g b-sm">Transcript</button><button class="btn b-g b-sm" onclick="askCalClaude('standup')">Ask Claude to prep</button></div>
-        </div>
-      </div>
-
-      <div class="ev">
-        <div class="ev-time"><div class="ev-t">10:00</div><div class="ev-ap">AM</div></div>
-        <div class="ev-spine"><div class="ev-dot" style="background:var(--a1)"></div><div class="ev-line"></div></div>
-        <div class="ev-info">
-          <div class="ev-title">CASG — Delivery Review<span class="ev-src ev-ms" style="margin-left:6px">Outlook</span></div>
-          <div class="ev-det">Teams · James M, Sarah L +3 · External · 45 min</div>
-          <div class="ev-acts"><button class="btn b-g b-sm">Transcript ON</button><button class="btn b-g b-sm">Agenda</button><button class="btn b-g b-sm" onclick="askCalClaude('casg')">Brief me</button></div>
-        </div>
-      </div>
-
-      <div class="ev">
-        <div class="ev-time"><div class="ev-t">1:00</div><div class="ev-ap">PM</div></div>
-        <div class="ev-spine"><div class="ev-dot" style="background:var(--gd)"></div><div class="ev-line"></div></div>
-        <div class="ev-info">
-          <div class="ev-title">NLA Bid — Storyboard<span class="ev-src ev-gc" style="margin-left:6px">Google</span></div>
-          <div class="ev-det">Meet · Tom K, Priya S · Internal · 30 min</div>
-          <div class="ev-acts"><button class="btn b-g b-sm">Transcript ON</button><button class="btn b-g b-sm" onclick="askCalClaude('nla')">Brief me</button></div>
-        </div>
-      </div>
-
-      <div class="ev">
-        <div class="ev-time"><div class="ev-t">3:30</div><div class="ev-ap">PM</div></div>
-        <div class="ev-spine"><div class="ev-dot" style="background:var(--gn)"></div></div>
-        <div class="ev-info">
-          <div class="ev-title">AER — Discovery Kickoff<span class="ev-src ev-ap-badge" style="margin-left:6px">Apple</span></div>
-          <div class="ev-det">Zoom · External · AER leadership · 60 min</div>
-          <div class="ev-acts"><button class="btn b-g b-sm">Transcript ON</button><button class="btn b-g b-sm">Brief</button><button class="btn b-g b-sm" onclick="askCalClaude('aer')">Brief me</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-stack">
-      <div class="card" id="cal-ai-card">
-        <div class="ct" style="margin-bottom:9px">AI Calendar Insights</div>
-        <div id="cal-ai-body" style="font-size:12px;color:var(--d1);line-height:1.8">
-          <div style="margin-bottom:7px"><strong style="color:var(--tx)">Conflict detected:</strong> AIHW renewal deadline COB — no time blocked for drafting a response.</div>
-          <div style="margin-bottom:7px"><strong style="color:var(--tx)">Suggestion:</strong> Block 11:00–11:30 AM to draft the AIHW reply.</div>
-          <div><strong style="color:var(--tx)">Meeting load:</strong> 2.5h of meetings today. Claude handles inbox triage while you're in calls.</div>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:10px">
-          <button class="btn b-p b-sm" onclick="blockTime()">Block 11–11:30 AM</button>
-          <button class="btn b-g b-sm" onclick="askCalClaude('general')">Ask Claude</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="ct" style="margin-bottom:10px">This Week</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--br);font-size:11.5px;color:var(--d1)"><span>NLA submission deadline</span><span class="tag t-r">Today EOD</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--br);font-size:11.5px;color:var(--d1)"><span>ASD closure sign-off</span><span class="tag t-b">Thu 10 AM</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--br);font-size:11.5px;color:var(--d1)"><span>CASG delivery review</span><span class="tag t-a">Fri 3 PM</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:11.5px;color:var(--d1)"><span>AIHW contract renewal</span><span class="tag t-r">COB today</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ CONNECTIONS ════════════════════════════════════════════ -->
-<div class="pg" id="pg-connect">
-  <div class="g2">
-    <div class="card">
-      <div class="ch"><div class="ct">Email &amp; Calendar</div></div>
-
-      <div class="prov" id="prov-microsoft">
-        <div class="prov-ic" style="background:rgba(0,120,212,.15);color:#60A5FA">M</div>
-        <div class="prov-b">
-          <div class="prov-nm">Microsoft 365</div>
-          <div class="prov-det">Outlook email + Calendar. Connects via Microsoft OAuth.</div>
-          <div class="prov-status" id="ms-status"><div class="ps-dot" style="background:var(--d2)"></div><span style="color:var(--d2)">Not connected</span></div>
-        </div>
-        <button class="btn b-cy b-sm" id="btn-ms" onclick="connectProvider('microsoft')">Connect</button>
-      </div>
-
-      <div class="prov" id="prov-google">
-        <div class="prov-ic" style="background:rgba(66,133,244,.15);color:#93C5FD">G</div>
-        <div class="prov-b">
-          <div class="prov-nm">Google</div>
-          <div class="prov-det">Gmail + Google Calendar. Connects via Google OAuth.</div>
-          <div class="prov-status" id="gc-status"><div class="ps-dot" style="background:var(--d2)"></div><span style="color:var(--d2)">Not connected</span></div>
-        </div>
-        <button class="btn b-cy b-sm" id="btn-gc" onclick="connectProvider('google')">Connect</button>
-      </div>
-
-      <div class="prov" id="prov-apple">
-        <div class="prov-ic" style="background:rgba(255,255,255,.07);color:var(--d1)">A</div>
-        <div class="prov-b">
-          <div class="prov-nm">Apple Mail &amp; Calendar</div>
-          <div class="prov-det">iCloud IMAP + CalDAV. Enter your Apple ID credentials.</div>
-          <div class="prov-status" id="ap-status"><div class="ps-dot" style="background:var(--d2)"></div><span style="color:var(--d2)">Not connected</span></div>
-        </div>
-        <button class="btn b-g b-sm" id="btn-ap" onclick="showAppleForm()">Connect</button>
-      </div>
-
-      <!-- Apple iCloud form -->
-      <div id="apple-form" style="display:none;background:var(--gl);border:1px solid var(--br);border-radius:8px;padding:12px;margin-top:8px">
-        <div style="font-size:11px;color:var(--d2);margin-bottom:10px">Apple requires an app-specific password. <a href="#" onclick="window.arie.shell.open('https://appleid.apple.com/account/manage')" style="color:var(--a3)">Generate one here</a> under Security → App-Specific Passwords.</div>
-        <div class="fg" style="margin-bottom:8px"><label class="fl">Apple ID (email)</label><input class="fi" id="apple-email" placeholder="you@icloud.com"></div>
-        <div class="fg" style="margin-bottom:10px"><label class="fl">App-specific password</label><input class="fi" id="apple-pw" type="password" placeholder="xxxx-xxxx-xxxx-xxxx"></div>
-        <div style="display:flex;gap:6px">
-          <button class="btn b-p b-sm" onclick="connectApple()">Connect Apple</button>
-          <button class="btn b-g b-sm" onclick="document.getElementById('apple-form').style.display='none'">Cancel</button>
-        </div>
-      </div>
-
-      <div id="connect-spinner" class="connecting"><div class="spinner"></div><span id="connect-msg">Connecting...</span></div>
-    </div>
-
-    <div class="col-stack">
-      <div class="card">
-        <div class="ct" style="margin-bottom:10px">Claude AI</div>
-        <div class="prov" id="prov-claude" style="margin-bottom:0">
-          <div class="prov-ic" style="background:rgba(30,84,212,.15);color:var(--a3)">AI</div>
-          <div class="prov-b">
-            <div class="prov-nm">Anthropic Claude</div>
-            <div class="prov-det">Your API key — usage billed to your Anthropic account.</div>
-            <div class="prov-status" id="claude-status"><div class="ps-dot" style="background:var(--d2)"></div><span style="color:var(--d2)">Not configured</span></div>
-          </div>
-          <button class="btn b-g b-sm" onclick="nav('settings')">Configure</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ct" style="margin-bottom:9px">Privacy</div>
-        <div style="font-size:12px;color:var(--d1);line-height:1.75">Your email and calendar data is processed locally. Arie never stores email content on our servers. Only AI query text is sent to Anthropic — your actual emails stay on your device.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ COSTS ══════════════════════════════════════════════════ -->
-<div class="pg" id="pg-costs">
-
-  <!-- Out of credits warning — shown when balance hits 0 -->
-  <div id="cost-empty-warn" style="display:none;background:rgba(229,53,101,.07);border:1px solid rgba(229,53,101,.28);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px">
-    <div style="font-size:20px;flex-shrink:0">🚨</div>
-    <div>
-      <div style="font-size:11px;font-weight:700;color:#FB7185;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Credits exhausted — card is now being charged</div>
-      <div style="font-size:12px;color:var(--d1);line-height:1.7">Your Anthropic credit balance has run out. <strong style="color:var(--tx)">Every query you send right now is being charged directly to your payment card</strong> on file with Anthropic. Top up your credits or set a spend limit to stay in control.</div>
-      <div style="display:flex;gap:7px;margin-top:9px">
-        <button class="btn b-sm" style="background:rgba(229,53,101,.15);color:#FB7185;border:1px solid rgba(229,53,101,.3)" onclick="openExternal('https://console.anthropic.com/settings/billing')">Top up credits</button>
-        <button class="btn b-g b-sm" onclick="openExternal('https://console.anthropic.com/settings/billing')">Set spend limit</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Low balance warning — shown when balance under $5 -->
-  <div id="cost-low-warn" style="display:none;background:rgba(224,155,26,.06);border:1px solid rgba(224,155,26,.22);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px">
-    <div style="font-size:20px;flex-shrink:0">⚠️</div>
-    <div>
-      <div style="font-size:11px;font-weight:700;color:#FCD34D;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Credit balance low</div>
-      <div style="font-size:12px;color:var(--d1);line-height:1.7" id="cost-low-msg">Your Anthropic credit balance is running low. Once it runs out, <strong style="color:var(--tx)">queries will draw directly from your card</strong>. Top up now to avoid interruption.</div>
-      <div style="display:flex;gap:7px;margin-top:9px">
-        <button class="btn b-p b-sm" onclick="openExternal('https://console.anthropic.com/settings/billing')">Top up credits</button>
-        <button class="btn b-g b-sm" onclick="dismissLowWarn()">Dismiss</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Stat row -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-    <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a1),var(--cy))"></div>
-      <div style="font-size:9.5px;color:var(--d1);text-transform:uppercase;letter-spacing:1.3px;font-weight:600;margin-bottom:4px">This Month</div>
-      <div style="font-family:var(--fh);font-size:24px;font-weight:800;margin-bottom:2px" id="cost-month">$0.0000</div>
-      <div style="font-size:10.5px;color:var(--d1)">Anthropic charges</div>
-    </div>
-    <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gd),#FCD34D)"></div>
-      <div style="font-size:9.5px;color:var(--d1);text-transform:uppercase;letter-spacing:1.3px;font-weight:600;margin-bottom:4px">Today</div>
-      <div style="font-family:var(--fh);font-size:24px;font-weight:800;margin-bottom:2px" id="cost-today">$0.0000</div>
-      <div style="font-size:10.5px;color:var(--d1)">Today's spend</div>
-    </div>
-    <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gn),#34D399)"></div>
-      <div style="font-size:9.5px;color:var(--d1);text-transform:uppercase;letter-spacing:1.3px;font-weight:600;margin-bottom:4px">Total Tokens</div>
-      <div style="font-family:var(--fh);font-size:24px;font-weight:800;margin-bottom:2px" id="cost-tokens">0</div>
-      <div style="font-size:10.5px;color:var(--d1)">Input + output</div>
-    </div>
-    <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--vi,#6E30D8),#A78BFA)"></div>
-      <div style="font-size:9.5px;color:var(--d1);text-transform:uppercase;letter-spacing:1.3px;font-weight:600;margin-bottom:4px">Queries</div>
-      <div style="font-family:var(--fh);font-size:24px;font-weight:800;margin-bottom:2px" id="cost-queries">0</div>
-      <div style="font-size:10.5px;color:var(--d1)">This month</div>
-    </div>
-  </div>
-
-  <!-- Spend limit bar -->
-  <div class="card">
-    <div class="ch">
-      <div class="ct">Monthly Spend</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;color:var(--d1)">Limit:</span>
-        <input type="number" id="spend-limit-input" style="width:70px;background:var(--gl);border:1px solid var(--br);border-radius:6px;padding:3px 7px;color:var(--tx);font-size:12px;outline:none" value="20" min="1" max="500" onchange="updateSpendLimit(this.value)">
-        <span style="font-size:11px;color:var(--d1)">/month</span>
-        <button class="btn b-g b-sm" onclick="openExternal('https://console.anthropic.com/settings/billing')">Set on Anthropic</button>
-      </div>
-    </div>
-    <div style="height:8px;background:var(--br);border-radius:4px;overflow:hidden;margin-bottom:6px">
-      <div id="spend-bar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--a1),var(--cy));transition:width .4s ease;width:0%"></div>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--d2)">
-      <span id="spend-bar-left">$0.00 spent</span>
-      <span id="spend-bar-right">$20.00 limit</span>
-    </div>
-  </div>
-
-  <!-- Usage breakdown + query log side by side -->
-  <div class="g2">
-    <div class="card">
-      <div class="ch"><div class="ct">Usage by Feature</div><button class="btn b-g b-sm" onclick="openExternal('https://console.anthropic.com/settings/billing')">Full history on Anthropic</button></div>
-      <div id="feature-breakdown">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br)">
-          <div><div style="font-size:12px;color:var(--tx)">Email drafting</div><div style="font-size:10.5px;color:var(--d2)" id="feat-email-tokens">0 tokens</div></div>
-          <span id="cost-email" style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--tx)">$0.0000</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br)">
-          <div><div style="font-size:12px;color:var(--tx)">Calendar insights</div><div style="font-size:10.5px;color:var(--d2)" id="feat-cal-tokens">0 tokens</div></div>
-          <span id="cost-cal" style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--tx)">$0.0000</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br)">
-          <div><div style="font-size:12px;color:var(--tx)">AI chat</div><div style="font-size:10.5px;color:var(--d2)" id="feat-chat-tokens">0 tokens</div></div>
-          <span id="cost-chat" style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--tx)">$0.0000</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
-          <div><div style="font-size:12px;color:var(--tx)">Other</div><div style="font-size:10.5px;color:var(--d2)" id="feat-other-tokens">0 tokens</div></div>
-          <span id="cost-other" style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--tx)">$0.0000</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="ch"><div class="ct">Recent Queries</div><button class="btn b-g b-sm" onclick="clearLog()">Clear</button></div>
-      <div id="query-log" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto">
-        <div style="font-size:11.5px;color:var(--d2);text-align:center;padding:20px 0">No queries yet this session.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Billing explainer -->
-  <div class="card">
-    <div class="ct" style="margin-bottom:10px">How billing works</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div style="background:var(--gl);border:1px solid var(--br);border-radius:8px;padding:11px 13px">
-        <div style="font-size:10px;font-weight:700;color:var(--a3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Arie — $10/month</div>
-        <div style="font-size:11.5px;color:var(--d1);line-height:1.7">Platform subscription. Covers the app, email + calendar integration, and all features. Billed by Arie.</div>
-      </div>
-      <div style="background:var(--gl);border:1px solid var(--br);border-radius:8px;padding:11px 13px">
-        <div style="font-size:10px;font-weight:700;color:var(--cy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Anthropic — Pay per use</div>
-        <div style="font-size:11.5px;color:var(--d1);line-height:1.7">AI usage charged by Anthropic to your account. Typical consultant usage is $5–20/month. Billed by Anthropic directly.</div>
-      </div>
-    </div>
-    <div style="background:rgba(229,53,101,.05);border:1px solid rgba(229,53,101,.16);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--d1);line-height:1.7">
-      <strong style="color:#FB7185">Important:</strong> Once your Anthropic prepaid credit runs out, every query charges your card directly. Set a monthly spend limit at <strong style="color:var(--tx)">console.anthropic.com → Billing</strong> to cap unexpected charges.
-    </div>
-    <button class="btn b-g b-sm" style="margin-top:10px" onclick="openExternal('https://console.anthropic.com/settings/billing')">Manage on Anthropic console</button>
-  </div>
-</div>
-
-<!-- ══ SETTINGS ════════════════════════════════════════════════ -->
-<div class="pg" id="pg-settings">
-  <div class="g2">
-    <div class="card">
-      <div class="ct" style="margin-bottom:14px">Account</div>
-      <div class="fg"><label class="fl">Full name</label><input class="fi" id="set-name" placeholder="Your name"></div>
-      <div class="fg"><label class="fl">Email</label><input class="fi" id="set-email" placeholder="you@company.com" disabled style="opacity:.5"></div>
-      <div class="fg">
-        <label class="fl">Anthropic API Key</label>
-        <input class="fi" id="set-apikey" type="password" placeholder="sk-ant-api03-...">
-        <div style="font-size:10.5px;color:var(--d2);margin-top:3px">Stored encrypted on your device. Never sent to Arie servers.</div>
-      </div>
-      <button class="btn b-p b-sm" onclick="saveSettings()">Save changes</button>
-    </div>
-    <div class="card">
-      <div class="ct" style="margin-bottom:12px">AI Preferences</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br);font-size:12px"><span style="color:var(--tx)">Always show confidence rating</span><button class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tog-k"></div></button></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br);font-size:12px"><span style="color:var(--tx)">Learn from my email edits</span><button class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tog-k"></div></button></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:12px"><span style="color:var(--tx)">Flag calendar conflicts on emails</span><button class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tog-k"></div></button></div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══ FEEDBACK ═════════════════════════════════════════════════ -->
-<div class="pg" id="pg-feedback">
-  <div style="max-width:560px">
-    <div class="card">
-      <div class="ct" style="margin-bottom:4px">Send feedback</div>
-      <div style="font-size:12px;color:var(--d1);margin-bottom:18px;line-height:1.7">Your feedback goes directly to the team. We read everything — good and bad.</div>
-
-      <div class="fg">
-        <label class="fl">Type</label>
-        <div style="display:flex;gap:7px;flex-wrap:wrap" id="fb-type-btns">
-          <button class="btn b-g b-sm fb-type on" data-type="Idea" onclick="selectFbType(this)">Idea</button>
-          <button class="btn b-g b-sm fb-type" data-type="Bug" onclick="selectFbType(this)">Bug</button>
-          <button class="btn b-g b-sm fb-type" data-type="Missing feature" onclick="selectFbType(this)">Missing feature</button>
-          <button class="btn b-g b-sm fb-type" data-type="General" onclick="selectFbType(this)">General</button>
-        </div>
-      </div>
-
-      <div class="fg" style="margin-top:12px">
-        <label class="fl">Your feedback</label>
-        <textarea class="fi" id="fb-body" style="height:130px;resize:vertical;line-height:1.6" placeholder="Tell us what's on your mind..."></textarea>
-      </div>
-
-      <div class="fg">
-        <label class="fl">Rating (optional)</label>
-        <div style="display:flex;gap:8px;font-size:20px;margin-top:4px" id="fb-stars">
-          <span class="fb-star" onclick="rateFb(1)" style="cursor:pointer;opacity:.35">★</span>
-          <span class="fb-star" onclick="rateFb(2)" style="cursor:pointer;opacity:.35">★</span>
-          <span class="fb-star" onclick="rateFb(3)" style="cursor:pointer;opacity:.35">★</span>
-          <span class="fb-star" onclick="rateFb(4)" style="cursor:pointer;opacity:.35">★</span>
-          <span class="fb-star" onclick="rateFb(5)" style="cursor:pointer;opacity:.35">★</span>
-        </div>
-      </div>
-
-      <div id="fb-no-email" style="display:none;background:rgba(224,155,26,.07);border:1px solid rgba(224,155,26,.22);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--d1);margin-top:4px">
-        Connect Microsoft 365 or Gmail in <span style="color:var(--a3);cursor:pointer" onclick="nav('connect')">Connections</span> first — feedback sends from your email account.
-      </div>
-
-      <button class="btn b-p b-sm" style="margin-top:18px;width:100%" id="fb-submit" onclick="submitFeedback()">Send feedback</button>
-
-      <div id="fb-sent" style="display:none;background:rgba(10,168,112,.07);border:1px solid rgba(10,168,112,.22);border-radius:8px;padding:12px 14px;margin-top:14px;font-size:12px;color:var(--d1)">
-        <strong style="color:#34D399">Sent.</strong> Thanks — we read every submission.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STAFF REPORTS (admin only) ═══════════════════════════════ -->
-<div class="pg" id="pg-reports">
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <div style="font-family:var(--fh);font-size:1.3rem;font-weight:800;color:var(--tx)">Staff Reports</div>
-      <div style="font-size:12px;color:var(--d1);margin-top:3px">Daily task completion · End-to-end encrypted · Visible to you only</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="reports-days" onchange="loadReports()" style="background:var(--s2);border:1px solid var(--d3);color:var(--tx);padding:7px 10px;border-radius:7px;font-size:12px;font-family:var(--fb)">
-        <option value="7">Last 7 days</option>
-        <option value="14">Last 14 days</option>
-        <option value="30">Last 30 days</option>
-      </select>
-      <button class="btn b-g b-sm" onclick="loadReports()">↻ Refresh</button>
-    </div>
-  </div>
-
-  <!-- Tracking toggles -->
-  <div class="card" style="margin-bottom:18px">
-    <div class="ct" style="margin-bottom:6px">Tracking settings</div>
-    <div style="font-size:12px;color:var(--d1);margin-bottom:14px;line-height:1.6">Enable activity tracking per team member. Reports are compiled on their device and encrypted so only you can read them.</div>
-    <div id="tracking-toggles"><div style="color:var(--d1);font-size:13px">Loading team...</div></div>
-  </div>
-
-  <!-- Reports grid -->
-  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start" id="reports-grid">
-    <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:12px 14px;border-bottom:1px solid var(--d3);font-size:10px;font-weight:700;color:var(--d1);text-transform:uppercase;letter-spacing:.08em">Team members</div>
-      <div id="reports-member-list" style="padding:6px"></div>
-    </div>
-    <div id="report-detail">
-      <div class="card" style="text-align:center;padding:40px 24px;color:var(--d1)">
-        <div style="font-size:28px;margin-bottom:10px">📊</div>
-        <div style="font-size:13px">Select a team member to view their reports</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /body -->
-</div><!-- /layout -->
-
-<!-- AI PANEL -->
-<div class="aip" id="aip">
-  <div class="ai-h">
-    <div><div class="ai-ht">Claude</div></div>
-    <button onclick="toggleAI()" style="background:none;border:none;color:var(--d1);cursor:pointer;font-size:16px">✕</button>
-  </div>
-  <div class="ai-msgs" id="ai-msgs">
-    <div class="am b"><div class="am-av b" style="color:#fff;font-size:8px">AI</div><div class="am-b">Hi — I'm Claude. Ask me anything about your emails, calendar or work.<div class="conf-bar"><div class="conf-track"><div class="conf-fill" style="width:100%"></div></div>Ready</div></div></div>
-  </div>
-  <div class="ai-inp">
-    <textarea class="ai-ta" id="ai-input" placeholder="Ask Claude..." onkeydown="aiKey(event)"></textarea>
-    <button class="ai-send" onclick="aiSend()">▶</button>
-  </div>
-</div>
-
-<script>
-// ── Email data ────────────────────────────────────────────────
-const EMAILS = {
-  jm:{from:'James Mitchell — CASG',time:'Today 9:14 AM',av:'JM',bg:'linear-gradient(135deg,#6E30D8,#EC4899)',sub:'Re: Data Migration — Scope Change Request',type:'question',summary:'James is asking whether the 3 new security requirements from ASD can be absorbed into the current delivery timeline, or whether a formal scope change is needed. He needs your decision before Friday\'s review meeting — this directly affects the M3 milestone date.',calConflict:true,calMsg:'A "yes to scope change" response pushes M3 past Mar 28, conflicting with the CASG Delivery Review on Friday. Claude recommends blocking 30 min Thursday morning to agree revised dates before the meeting.',drafts:['James,\n\nThe three requirements need a formal scope change — absorbing them in the current timeline isn\'t viable without pushing M3.\n\nI\'ll have a revised milestone schedule to you by Thursday morning before Friday\'s review. Can you confirm whether CASG needs board approval for scope variations?\n\nAlexia','James,\n\nScope change needed. M3 will shift — will confirm the new date by Thursday.\n\nNeed to know if CASG requires formal board sign-off before I draft the change request.\n\nAlexia'],styleNote:'Learned: shortened "I will have" → "I\'ll", removed "Please" opener. Style updated (848 edits total).'},
-  sr:{from:'Sarah R. — AIHW',time:'Today 8:42 AM',av:'SR',bg:'linear-gradient(135deg,#047857,#10B981)',sub:'Contract renewal — decision needed COB',type:'question',summary:'AIHW is requesting formal confirmation of the 12-month contract extension by close of business today. The extension is on current terms. A simple yes or no is all that\'s needed — no negotiation implied.',calConflict:false,drafts:['Sarah,\n\nConfirmed — happy to extend on current terms for 12 months.\n\nI\'ll have the countersigned agreement back to you by end of week.\n\nAlexia','Sarah,\n\nYes to the 12-month extension on current terms. Will countersign and return by Friday.\n\nAlexia'],styleNote:'Learned: removed "Please find" opener, tightened closing. Style updated.'},
-  tk:{from:'Tom K. — Internal',time:'Yesterday',av:'TK',bg:'linear-gradient(135deg,#B45309,#F59E0B)',sub:'NLA proposal — Sections 3 & 4 ready',type:'statement',summary:'Tom has completed the pricing model and executive summary for the NLA Digital Uplift proposal. He\'s flagging that resource assumptions in Section 4 need your sign-off before he can finalise the document. No question — just requesting your review.',calConflict:false,drafts:['Tom,\n\nOn it — will review Section 4 this afternoon and get back to you before EOD.\n\nAlexia'],styleNote:'Learned: "On it" replaces "Thanks, I will take a look". Style updated.'},
-  ps:{from:'Priya S. — Internal',time:'Yesterday',av:'PS',bg:'linear-gradient(135deg,#0A9488,#2DD4BF)',sub:'SGW risk register — 2 new items',type:'statement',summary:'Priya has added two new risks to the SGW risk register: vendor dependency (medium) and stakeholder availability (medium). No action required — flagged for your awareness as Director.',calConflict:false,drafts:['Priya,\n\nSeen — thanks for keeping the register current. Flag me if either escalates.\n\nAlexia'],styleNote:'Learned: "Seen —" preferred over "Thank you, I have noted this." Style updated.'}
-};
-
-let currentEmail = null;
-let draftIdx = 0;
-let draftEdited = false;
-let providerStatus = { microsoft: false, google: false, apple: false };
-let costs = { month: 0, today: 0, tokens: 0, queries: 0, email: 0, cal: 0, chat: 0, other: 0, emailTokens: 0, calTokens: 0, chatTokens: 0, otherTokens: 0 };
-let chatHistory = [];
-
-// ── Navigation ────────────────────────────────────────────────
-const PAGE_META = {
-  inbox:{title:'Inbox',cta:'Compose'},
-  calendar:{title:'Calendar',cta:'New event'},
-  connect:{title:'Connections',cta:''},
-  costs:{title:'AI Costs',cta:''},
-  settings:{title:'Settings',cta:'Save'},
-  feedback:{title:'Feedback',cta:''}
-};
-
-function nav(id) {
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  const pg = document.getElementById('pg-'+id);
-  const ni = document.getElementById('ni-'+id);
-  if(pg) pg.classList.add('on');
-  if(ni) ni.classList.add('on');
-  const m = PAGE_META[id]||{title:id,cta:''};
-  document.getElementById('pg-title').textContent = m.title;
-  document.getElementById('pg-cta').textContent = m.cta;
-  document.getElementById('pg-cta').style.display = m.cta ? 'flex' : 'none';
-  if(id === 'costs')   loadCosts();
-  if(id === 'reports') loadReportsPage();
-  // Record navigation activity for staff tracker
-  if(window.arie?.tracker) window.arie.tracker.record('navigation', id);
-}
-
-// ── Email flow ────────────────────────────────────────────────
-function openEmail(id) {
-  document.querySelectorAll('.er').forEach(e=>e.classList.remove('active-email'));
-  const el = document.getElementById('email-'+id);
-  if(el) el.classList.add('active-email');
-
-  currentEmail = id;
-  draftIdx = 0;
-  draftEdited = false;
-  const d = EMAILS[id];
-  if(!d) return;
-
-  document.getElementById('email-empty').style.display = 'none';
-  const det = document.getElementById('email-detail');
-  det.style.display = 'flex';
-
-  document.getElementById('ed-av').textContent = d.av;
-  document.getElementById('ed-av').style.background = d.bg;
-  document.getElementById('ed-from').textContent = d.from;
-  document.getElementById('ed-time').textContent = d.time;
-  document.getElementById('ed-sub').textContent = d.sub;
-  document.getElementById('ed-summary').textContent = d.summary;
-  document.getElementById('ed-type').innerHTML = d.type === 'question'
-    ? '<span class="tag t-r">Question — reply needed</span>'
-    : '<span class="tag t-m">Statement — FYI</span>';
-
-  const cb = document.getElementById('conflict-banner');
-  if(d.calConflict) {
-    cb.style.display = 'block';
-    document.getElementById('conflict-msg').textContent = d.calMsg;
-  } else {
-    cb.style.display = 'none';
-  }
-
-  document.getElementById('ed-instructions-card').style.display = d.type === 'question' ? 'block' : 'none';
-  document.getElementById('ed-instructions').value = '';
-  document.getElementById('style-learned').style.display = 'none';
-  document.getElementById('learn-btn').style.display = 'none';
-
-  const draftDiv = document.getElementById('ed-draft');
-  if(d.drafts && d.drafts.length) {
-    draftDiv.style.display = 'block';
-    document.getElementById('ed-draft-text').value = d.drafts[0];
-    document.getElementById('ed-conf').textContent = '91%';
-  } else {
-    draftDiv.style.display = 'none';
-  }
-}
-
-async function generateDraft() {
-  const d = EMAILS[currentEmail];
-  if(!d) return;
-  const instructions = document.getElementById('ed-instructions').value;
-  const draftDiv = document.getElementById('ed-draft');
-  const draftText = document.getElementById('ed-draft-text');
-  const conf = document.getElementById('ed-conf');
-
-  draftText.value = 'Drafting...';
-  draftDiv.style.display = 'block';
-  conf.textContent = '...';
-
-  // Real Claude call if available, else use static drafts
-  if(window.arie) {
-    const system = `You are drafting a professional email reply on behalf of Alexia H., a consulting firm Director. Her style: short sentences, direct, professional but not stiff, active voice, signs off as "Alexia". ${instructions ? 'Her instructions: '+instructions : ''}`;
-    const result = await window.arie.claude.chat([
-      { role:'user', content:`Email received:\nFrom: ${d.from}\nSubject: ${d.sub}\n\nSummary: ${d.summary}\n\nDraft a concise reply.` }
-    ], system);
-
-    if(result.error) {
-      draftText.value = d.drafts[0];
-      conf.textContent = '91%';
-    } else {
-      draftText.value = result.text;
-      conf.textContent = '93%';
-      logQuery('email', result.usage?.input_tokens||0, result.usage?.output_tokens||0, result.cost||0);
-    }
-  } else {
-    draftText.value = d.drafts[draftIdx % d.drafts.length];
-    conf.textContent = '91%';
-  }
-  draftEdited = false;
-  document.getElementById('style-learned').style.display = 'none';
-  document.getElementById('learn-btn').style.display = 'none';
-}
-
-function regenerate() {
-  const d = EMAILS[currentEmail];
-  if(!d || !d.drafts || d.drafts.length < 2) return;
-  draftIdx++;
-  document.getElementById('ed-draft-text').value = d.drafts[draftIdx % d.drafts.length];
-  draftEdited = false;
-  document.getElementById('style-learned').style.display = 'none';
-  document.getElementById('learn-btn').style.display = 'none';
-}
-
-function markEdited() {
-  if(!draftEdited) {
-    draftEdited = true;
-    document.getElementById('learn-btn').style.display = 'inline-flex';
-  }
-}
-
-function learnStyle() {
-  const d = EMAILS[currentEmail];
-  const sl = document.getElementById('style-learned');
-  sl.textContent = d ? d.styleNote : 'Style updated from your edits.';
-  sl.style.display = 'block';
-  document.getElementById('learn-btn').style.display = 'none';
-  if(window.arie) window.arie.app.saveStyle({ lastLearned: new Date().toISOString(), email: currentEmail });
-}
-
-function fixConflict() {
-  document.getElementById('conflict-banner').innerHTML = '<div style="font-size:9.5px;font-weight:700;color:#34D399;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Calendar updated</div><div style="font-size:11.5px;color:var(--d1)">Blocked 9:00–9:30 AM Thursday for milestone rescheduling with James. Internal review moved to 2:00 PM. CASG Delivery Review on Friday is safe.</div>';
-}
-
-function filterEmails(type) {
-  document.querySelectorAll('.er').forEach(e=>{
-    if(type==='all'){e.style.display='flex';return;}
-    const ai = e.querySelector('.e-ai');
-    if(!ai){e.style.display='none';return;}
-    const txt = ai.textContent.toLowerCase();
-    if(type==='urgent') e.style.display = e.querySelector('.pr-hi') ? 'flex' : 'none';
-    if(type==='question') e.style.display = txt.includes('question') ? 'flex' : 'none';
-  });
-}
-
-function filterByProvider(p) {
-  document.querySelectorAll('.er').forEach(e=>{
-    const src = e.querySelector('.ev-src');
-    if(!src){e.style.display='none';return;}
-    const map = {microsoft:'outlook',google:'gmail',apple:'apple'};
-    e.style.display = src.textContent.toLowerCase().includes(map[p]||p) ? 'flex' : 'none';
-  });
-}
-
-// ── Calendar ──────────────────────────────────────────────────
-async function askCalClaude(context) {
-  toggleAI();
-  const prompts = {
-    standup:'What should I cover in today\'s 9 AM standup given my current project status?',
-    casg:'Brief me on the CASG Data Migration project before the 10 AM delivery review.',
-    nla:'What do I need to prepare for the NLA Bid storyboard meeting at 1 PM?',
-    aer:'Brief me on the AER AI Readiness Assessment discovery kickoff at 3:30 PM.',
-    general:'Analyse my calendar today and flag any issues or conflicts I should know about.'
-  };
-  const q = prompts[context] || 'Help me with my calendar.';
-  document.getElementById('ai-input').value = q;
-  await aiSend();
-}
-
-function blockTime() {
-  const btn = event.target;
-  btn.textContent = 'Blocked ✓';
-  btn.classList.remove('b-p');
-  btn.classList.add('b-g');
-  btn.disabled = true;
-  document.getElementById('cal-ai-body').innerHTML = '<div style="margin-bottom:7px"><strong style="color:#34D399">Done:</strong> 11:00–11:30 AM blocked for AIHW response drafting.</div><div>Meeting load remains 2.5h. Claude will triage inbox during your CASG call.</div>';
-}
-
-// ── Provider connections ──────────────────────────────────────
-async function connectProvider(provider) {
-  const spinner = document.getElementById('connect-spinner');
-  const msg     = document.getElementById('connect-msg');
-  const btn     = document.getElementById('btn-' + (provider === 'microsoft' ? 'ms' : 'gc'));
-
-  spinner.style.display = 'flex';
-  msg.textContent = provider === 'microsoft'
-    ? 'Opening Microsoft sign-in in your browser...'
-    : 'Opening Google sign-in in your browser...';
-  btn.disabled = true;
-
-  const result = window.arie
-    ? await window.arie.oauth[provider]()
-    : { ok: true }; // demo fallback
-
-  spinner.style.display = 'none';
-  btn.disabled = false;
-
-  if (result.error) {
-    showConnectError(result.error);
-    return;
-  }
-
-  setConnected(provider);
-
-  // Pull real data now that we're connected
-  await fetchEmailsForProvider(provider);
-  await fetchCalendarForProvider(provider);
-}
-
-function showConnectError(msg) {
-  const spinner = document.getElementById('connect-spinner');
-  spinner.style.display = 'flex';
-  spinner.style.background = 'rgba(229,53,101,.07)';
-  spinner.style.borderColor = 'rgba(229,53,101,.2)';
-  document.getElementById('connect-msg').textContent = '✕ ' + msg;
-  setTimeout(() => {
-    spinner.style.display = 'none';
-    spinner.style.background = '';
-    spinner.style.borderColor = '';
-  }, 5000);
-}
-
-function showAppleForm() {
-  document.getElementById('apple-form').style.display = 'block';
-}
-
-async function connectApple() {
-  const email = document.getElementById('apple-email').value.trim();
-  const pw    = document.getElementById('apple-pw').value.trim();
-  if (!email || !pw) return;
-
-  const spinner = document.getElementById('connect-spinner');
-  const msg     = document.getElementById('connect-msg');
-  spinner.style.display = 'flex';
-  msg.textContent = 'Connecting to iCloud...';
-
-  const result = window.arie
-    ? await window.arie.oauth.apple({ email, password: pw })
-    : { ok: true };
-
-  document.getElementById('apple-form').style.display = 'none';
-  spinner.style.display = 'none';
-
-  if (result.error) { showConnectError(result.error); return; }
-  setConnected('apple');
-}
-
-function setConnected(provider) {
-  providerStatus[provider] = true;
-  const ids = { microsoft: 'ms', google: 'gc', apple: 'ap' };
-  const sid = ids[provider] + '-status';
-  document.getElementById(sid).innerHTML =
-    '<div class="ps-dot" style="background:var(--gn)"></div><span style="color:#34D399">Connected</span>';
-  document.getElementById('prov-' + provider).classList.add('connected');
-  const btn = document.getElementById('btn-' + ids[provider]);
-  btn.textContent = 'Disconnect';
-  btn.onclick = () => disconnectProvider(provider);
-  btn.className = 'btn b-g b-sm';
-  document.getElementById('not-connected-banner').style.display = 'none';
-}
-
-async function disconnectProvider(provider) {
-  if (window.arie) await window.arie.oauth.disconnect(provider);
-  providerStatus[provider] = false;
-  const ids = { microsoft: 'ms', google: 'gc', apple: 'ap' };
-  const sid = ids[provider] + '-status';
-  document.getElementById(sid).innerHTML =
-    '<div class="ps-dot" style="background:var(--d2)"></div><span style="color:var(--d2)">Not connected</span>';
-  document.getElementById('prov-' + provider).classList.remove('connected');
-  const btn = document.getElementById('btn-' + ids[provider]);
-  btn.textContent = 'Connect';
-  btn.onclick = () => provider === 'apple' ? showAppleForm() : connectProvider(provider);
-  btn.className = provider === 'apple' ? 'btn b-g b-sm' : 'btn b-cy b-sm';
-  // Clear real emails from that provider
-  document.querySelectorAll(`.er[data-provider="${provider}"]`).forEach(e => e.remove());
-}
-
-// ── Real email fetch ──────────────────────────────────────────
-async function fetchEmailsForProvider(provider) {
-  if (!window.arie) return;
-  const result = await window.arie.email.fetch(provider);
-  if (result.error || !result.emails) return;
-
-  const list = document.getElementById('email-list');
-  // Remove static demo emails for this provider if any
-  document.querySelectorAll(`.er[data-provider="${provider}"]`).forEach(e => e.remove());
-
-  const PROVIDER_LABELS = { microsoft: 'Outlook', google: 'Gmail', apple: 'Apple' };
-  const PROVIDER_CLASS  = { microsoft: 'ev-ms',   google: 'ev-gc',  apple: 'ev-ap-badge' };
-  const label = PROVIDER_LABELS[provider];
-  const cls   = PROVIDER_CLASS[provider];
-
-  result.emails.slice(0, 8).forEach(email => {
-    const initials = (email.from || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-    const prClass  = email.priority === 'high' ? 'pr-hi' : 'pr-lo';
-    const timeStr  = email.time ? new Date(email.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-
-    const div = document.createElement('div');
-    div.className = 'er';
-    div.dataset.provider = provider;
-    div.dataset.emailId  = email.id;
-    div.innerHTML = `
-      <div class="e-pr ${prClass}"></div>
-      <div class="e-av" style="background:linear-gradient(135deg,#1E54D4,#08B5CF)">${initials}</div>
-      <div class="e-b">
-        <div class="e-from">${email.from || 'Unknown'}</div>
-        <div class="e-sub">${email.subject || '(no subject)'}</div>
-        <div class="e-ai" id="ai-summary-${email.id}">Analysing with Claude...</div>
-      </div>
-      <div class="e-meta">
-        <div class="e-time">${timeStr}</div>
-        <span class="ev-src ${cls}">${label}</span>
-      </div>`;
-    div.onclick = () => openRealEmail(email, provider);
-    list.appendChild(div);
-
-    // Run Claude triage in background
-    triageEmail(email, provider);
-  });
-
-  // Update unread badge
-  const unread = result.emails.filter(e => !e.isRead).length;
-  const nb = document.getElementById('nb-inbox');
-  if (nb) nb.textContent = Math.min(99, (parseInt(nb.textContent) || 0) + unread);
-}
-
-async function triageEmail(email, provider) {
-  if (!window.arie) return;
-  const summaryEl = document.getElementById('ai-summary-' + email.id);
-  if (!summaryEl) return;
-
-  const result = await window.arie.claude.chat([{
-    role: 'user',
-    content: `Triage this email in one short sentence. Say whether it's a Question or Statement, and what action (if any) is needed. Be very concise — max 20 words.\n\nFrom: ${email.from}\nSubject: ${email.subject}\nPreview: ${email.preview || email.snippet || ''}`
-  }], 'You are an AI email triage assistant. Respond with a single short sentence starting with "Question —" or "Statement —".', 'email');
-
-  if (summaryEl && !result.error) {
-    summaryEl.textContent = result.text;
-    summaryEl.style.color = result.text.toLowerCase().startsWith('question') ? 'var(--a3)' : 'var(--d1)';
-    logQuery('email', result.usage?.input_tokens||0, result.usage?.output_tokens||0, result.cost||0);
-  }
-}
-
-async function openRealEmail(email, provider) {
-  document.querySelectorAll('.er').forEach(e => e.classList.remove('active-email'));
-  document.querySelector(`[data-email-id="${email.id}"]`)?.classList.add('active-email');
-
-  currentEmail = email.id;
-  draftIdx = 0;
-  draftEdited = false;
-
-  document.getElementById('email-empty').style.display = 'none';
-  const det = document.getElementById('email-detail');
-  det.style.display = 'flex';
-
-  const initials = (email.from || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-  document.getElementById('ed-av').textContent = initials;
-  document.getElementById('ed-av').style.background = 'linear-gradient(135deg,#1E54D4,#08B5CF)';
-  document.getElementById('ed-from').textContent = email.from || 'Unknown';
-  document.getElementById('ed-time').textContent = email.time ? new Date(email.time).toLocaleString() : '';
-  document.getElementById('ed-sub').textContent = email.subject || '(no subject)';
-  document.getElementById('ed-summary').textContent = 'Generating summary with Claude...';
-  document.getElementById('ed-type').innerHTML = '';
-  document.getElementById('conflict-banner').style.display = 'none';
-  document.getElementById('ed-instructions-card').style.display = 'none';
-  document.getElementById('ed-draft').style.display = 'none';
-  document.getElementById('style-learned').style.display = 'none';
-  document.getElementById('learn-btn').style.display = 'none';
-
-  // Claude summarises the email
-  const sumResult = await window.arie.claude.chat([{
-    role: 'user',
-    content: `Summarise this email clearly in 2–3 sentences. State whether it requires a reply. Identify any deadline.\n\nFrom: ${email.from}\nSubject: ${email.subject}\nContent: ${email.preview || email.snippet || '(no preview available)'}`
-  }], 'You are a professional email assistant. Be concise and clear.', 'email');
-
-  if (!sumResult.error) {
-    document.getElementById('ed-summary').textContent = sumResult.text;
-    logQuery('email', sumResult.usage?.input_tokens||0, sumResult.usage?.output_tokens||0, sumResult.cost||0);
-    const isQuestion = sumResult.text.toLowerCase().includes('reply') || sumResult.text.toLowerCase().includes('response') || sumResult.text.toLowerCase().includes('decision');
-    document.getElementById('ed-type').innerHTML = isQuestion
-      ? '<span class="tag t-r">Reply needed</span>'
-      : '<span class="tag t-m">FYI</span>';
-    document.getElementById('ed-instructions-card').style.display = isQuestion ? 'block' : 'none';
-
-    // Auto-generate draft for questions
-    if (isQuestion) {
-      currentEmailData = { from: email.from, subject: email.subject, summary: sumResult.text, provider };
-      await generateDraft();
-    }
-  }
-}
-
-// Store current real email data for draft generation
-let currentEmailData = null;
-
-// ── Real calendar fetch ───────────────────────────────────────
-async function fetchCalendarForProvider(provider) {
-  if (!window.arie) return;
-  const result = await window.arie.calendar.fetch(provider);
-  if (result.error || !result.events) return;
-
-  const PROVIDER_CLASS = { microsoft: 'ev-ms', google: 'ev-gc', apple: 'ev-ap-badge' };
-  const PROVIDER_LABEL = { microsoft: 'Outlook', google: 'Google', apple: 'Apple' };
-  const cls   = PROVIDER_CLASS[provider];
-  const label = PROVIDER_LABEL[provider];
-
-  // Insert real events into calendar page (after the static ones)
-  const calCard = document.querySelector('#pg-calendar .card');
-  result.events.slice(0, 5).forEach(event => {
-    const start = event.start ? new Date(event.start) : null;
-    const timeStr = start ? start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-    const div = document.createElement('div');
-    div.className = 'ev';
-    div.innerHTML = `
-      <div class="ev-time"><div class="ev-t">${timeStr.split(':')[0]||'—'}</div><div class="ev-ap">${timeStr.split(' ')[1]||''}</div></div>
-      <div class="ev-spine"><div class="ev-dot" style="background:var(--a3)"></div></div>
-      <div class="ev-info">
-        <div class="ev-title">${event.title||'Untitled'} <span class="ev-src ${cls}">${label}</span></div>
-        <div class="ev-det">${event.location||''}</div>
-        <div class="ev-acts"><button class="btn b-g b-sm" onclick="askCalClaude('general')">Brief me</button></div>
-      </div>`;
-    calCard.appendChild(div);
-  });
-}
-
-// ── Init ──────────────────────────────────────────────────────
-// ── Costs ─────────────────────────────────────────────────────
-let spendLimit = 20;
-let lowWarnDismissed = false;
-const queryLog = [];
-
-function openExternal(url) {
-  if(window.arie) window.arie.shell.open(url);
-  else window.open(url, '_blank');
-}
-
-function updateSpendLimit(val) {
-  spendLimit = parseFloat(val) || 20;
-  refreshCostUI();
-}
-
-function dismissLowWarn() {
-  lowWarnDismissed = true;
-  document.getElementById('cost-low-warn').style.display = 'none';
-}
-
-function logQuery(feature, inputTokens, outputTokens, cost) {
-  const now = new Date();
-  const time = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  queryLog.unshift({ feature, inputTokens, outputTokens, cost, time, date: now.toDateString() });
-  if(queryLog.length > 50) queryLog.pop();
-
-  // accumulate into costs object
-  costs.month += cost;
-  costs.today += cost;
-  costs.tokens += inputTokens + outputTokens;
-  costs.queries++;
-  if(feature === 'email') { costs.email += cost; costs.emailTokens = (costs.emailTokens||0) + inputTokens + outputTokens; }
-  else if(feature === 'calendar') { costs.cal += cost; costs.calTokens = (costs.calTokens||0) + inputTokens + outputTokens; }
-  else if(feature === 'chat') { costs.chat += cost; costs.chatTokens = (costs.chatTokens||0) + inputTokens + outputTokens; }
-  else { costs.other += cost; costs.otherTokens = (costs.otherTokens||0) + inputTokens + outputTokens; }
-
-  refreshCostUI();
-  checkWarnings();
-}
-
-function refreshCostUI() {
-  document.getElementById('cost-month').textContent = '$'+costs.month.toFixed(4);
-  document.getElementById('cost-today').textContent = '$'+costs.today.toFixed(4);
-  document.getElementById('cost-tokens').textContent = costs.tokens.toLocaleString();
-  document.getElementById('cost-queries').textContent = costs.queries || 0;
-  document.getElementById('cost-email').textContent = '$'+(costs.email||0).toFixed(4);
-  document.getElementById('cost-cal').textContent = '$'+(costs.cal||0).toFixed(4);
-  document.getElementById('cost-chat').textContent = '$'+(costs.chat||0).toFixed(4);
-  document.getElementById('cost-other').textContent = '$'+(costs.other||0).toFixed(4);
-  document.getElementById('feat-email-tokens').textContent = ((costs.emailTokens||0)).toLocaleString()+' tokens';
-  document.getElementById('feat-cal-tokens').textContent = ((costs.calTokens||0)).toLocaleString()+' tokens';
-  document.getElementById('feat-chat-tokens').textContent = ((costs.chatTokens||0)).toLocaleString()+' tokens';
-  document.getElementById('feat-other-tokens').textContent = ((costs.otherTokens||0)).toLocaleString()+' tokens';
-
-  // spend bar
-  const pct = Math.min(100, (costs.month / spendLimit) * 100);
-  const bar = document.getElementById('spend-bar');
-  bar.style.width = pct+'%';
-  bar.style.background = pct >= 90 ? 'linear-gradient(90deg,var(--rs),#FB7185)'
-    : pct >= 60 ? 'linear-gradient(90deg,var(--gd),#FCD34D)'
-    : 'linear-gradient(90deg,var(--a1),var(--cy))';
-  document.getElementById('spend-bar-left').textContent = '$'+costs.month.toFixed(2)+' spent';
-  document.getElementById('spend-bar-right').textContent = '$'+spendLimit.toFixed(2)+' limit';
-
-  // query log
-  const logEl = document.getElementById('query-log');
-  if(queryLog.length === 0) {
-    logEl.innerHTML = '<div style="font-size:11.5px;color:var(--d2);text-align:center;padding:20px 0">No queries yet this session.</div>';
-  } else {
-    logEl.innerHTML = queryLog.slice(0,20).map(q => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--gl);border-radius:6px;font-size:11px">
-        <div>
-          <span style="color:var(--tx);font-weight:500">${q.feature}</span>
-          <span style="color:var(--d2);margin-left:6px">${q.inputTokens}in + ${q.outputTokens}out</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="color:var(--d2)">${q.time}</span>
-          <span style="color:var(--tx);font-weight:600">$${q.cost.toFixed(5)}</span>
-        </div>
-      </div>`).join('');
-  }
-}
-
-function checkWarnings() {
-  const emptyEl = document.getElementById('cost-empty-warn');
-  const lowEl = document.getElementById('cost-low-warn');
-
-  if(costs.month >= spendLimit) {
-    emptyEl.style.display = 'flex';
-    lowEl.style.display = 'none';
-  } else if(costs.month >= spendLimit * 0.75 && !lowWarnDismissed) {
-    emptyEl.style.display = 'none';
-    lowEl.style.display = 'flex';
-    document.getElementById('cost-low-msg').textContent =
-      `You've used $${costs.month.toFixed(2)} of your $${spendLimit} limit this month. Once it runs out, queries will draw directly from your card.`;
-  } else {
-    emptyEl.style.display = 'none';
-    if(!lowWarnDismissed) lowEl.style.display = 'none';
-  }
-
-  // also show a subtle warning badge on sidebar nav item
-  const niCosts = document.getElementById('ni-costs');
-  if(niCosts) {
-    const existing = niCosts.querySelector('.nb');
-    if(costs.month >= spendLimit) {
-      if(!existing) niCosts.insertAdjacentHTML('beforeend','<span class="nb nb-r">!</span>');
-    } else if(costs.month >= spendLimit * 0.75) {
-      if(!existing) niCosts.insertAdjacentHTML('beforeend','<span class="nb nb-a">!</span>');
-    } else if(existing) {
-      existing.remove();
-    }
-  }
-}
-
-
-// ── Update banner ─────────────────────────────────────────────
-function showUpdateBanner(state, version) {
-  const banner = document.getElementById('update-banner');
-  const msg    = document.getElementById('update-msg');
-  const btn    = banner.querySelector('button');
-  if (state === 'downloading') {
-    msg.textContent = `Arie AI ${version} is downloading...`;
-    btn.style.display = 'none';
-  } else {
-    msg.textContent = `Arie AI ${version} is ready to install.`;
-    btn.style.display = '';
-  }
-  banner.style.display = 'flex';
-}
-
-function installUpdate() {
-  if (window.arie) window.arie.app.installUpdate();
-}
-
-function clearLog() {
-  queryLog.length = 0;
-  refreshCostUI();
-}
-
-async function loadCosts() {
-  if(window.arie) {
-    const c = await window.arie.claude.getCosts();
-    if(c) {
-      costs.month = c.monthlyCost || 0;
-      costs.tokens = c.totalTokens || 0;
-      costs.queries = c.totalQueries || 0;
-      costs.today = c.todayCost || 0;
-      costs.email = c.emailCost || 0;
-      costs.cal = c.calCost || 0;
-      costs.chat = c.chatCost || 0;
-      costs.other = c.otherCost || 0;
-    }
-  }
-  refreshCostUI();
-  checkWarnings();
-}
-
-// ── Settings ──────────────────────────────────────────────────
-async function saveSettings() {
-  const name   = document.getElementById('set-name').value.trim();
-  const apiKey = document.getElementById('set-apikey').value.trim();
-  const btn    = document.querySelector('#pg-settings .btn.b-p.b-sm');
-
-  if (!name) return;
-
-  const origText = btn.textContent;
-  btn.textContent = 'Saving...';
-  btn.disabled    = true;
-
-  try {
-    if (window.arie) {
-      if (apiKey) {
-        const result = await window.arie.onboard.validateKey(apiKey);
-        if (!result.valid) {
-          btn.textContent = 'Invalid API key';
-          btn.style.background = 'var(--rs)';
-          setTimeout(() => { btn.textContent = origText; btn.style.background = ''; btn.disabled = false; }, 2200);
-          return;
-        }
-        await window.arie.onboard.complete({
-          name, email: document.getElementById('set-email').value, apiKey
-        });
-      } else {
-        const style = await window.arie.app.getStyle();
-        await window.arie.app.saveStyle({ ...style, _userName: name });
-      }
-    }
-    document.getElementById('sb-name').textContent = name;
-    document.getElementById('sb-av').textContent   = name.substring(0,2).toUpperCase();
-    document.getElementById('set-apikey').value    = '';
-    btn.textContent = 'Saved';
-    btn.style.background = 'var(--gn)';
-    setTimeout(() => { btn.textContent = origText; btn.style.background = ''; btn.disabled = false; }, 1800);
-  } catch(e) {
-    btn.textContent = 'Error';
-    btn.style.background = 'var(--rs)';
-    setTimeout(() => { btn.textContent = origText; btn.style.background = ''; btn.disabled = false; }, 2000);
-  }
-}
-
-// ── AI panel ──────────────────────────────────────────────────
-function toggleAI() {
-  document.getElementById('aip').classList.toggle('op');
-}
-
-async function aiSend() {
-  const inp = document.getElementById('ai-input');
-  const msgs = document.getElementById('ai-msgs');
-  const txt = inp.value.trim();
-  if(!txt) return;
-
-  msgs.innerHTML += `<div class="am u"><div class="am-av u" style="color:#fff">You</div><div class="am-b">${txt}</div></div>`;
-  inp.value = '';
-  msgs.scrollTop = msgs.scrollHeight;
-
-  // typing indicator
-  const typingId = 'typing-'+Date.now();
-  msgs.innerHTML += `<div class="am b" id="${typingId}"><div class="am-av b" style="color:#fff;font-size:8px">AI</div><div class="am-b" style="color:var(--d2)">Thinking...</div></div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-
-  chatHistory.push({ role:'user', content: txt });
-
-  let reply = '';
-  if(window.arie) {
-    const result = await window.arie.claude.chat(
-      chatHistory,
-      'You are Arie AI, a smart work assistant for consultants. Be concise and direct. Always include a confidence percentage at the end in brackets like [92% confidence].'
-    );
-    if(result.error) {
-      reply = 'Error: '+result.error;
-    } else {
-      reply = result.text;
-      logQuery('chat', result.usage?.input_tokens||0, result.usage?.output_tokens||0, result.cost||0);
-    }
-  } else {
-    reply = 'Connect your Anthropic API key in Settings to enable real AI responses. [Demo mode]';
-  }
-
-  chatHistory.push({ role:'assistant', content: reply });
-  document.getElementById(typingId).remove();
-
-  // extract confidence if present
-  const confMatch = reply.match(/\[(\d+)%\s*confidence\]/i);
-  const confPct = confMatch ? confMatch[1] : '89';
-  const cleanReply = reply.replace(/\[\d+%\s*confidence\]/i, '').trim();
-
-  msgs.innerHTML += `<div class="am b"><div class="am-av b" style="color:#fff;font-size:8px">AI</div><div class="am-b">${cleanReply}<div class="conf-bar"><div class="conf-track"><div class="conf-fill" style="width:${confPct}%"></div></div>${confPct}% confidence</div></div></div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function aiKey(e) {
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiSend();}
-}
-
-// ── Init ──────────────────────────────────────────────────────
-async function init() {
-  if(window.arie) {
-    // Tray menu can navigate directly to a page
-    window.arie.onTrayNav((page) => nav(page));
-
-    // Auto-update notifications from main process
-    if (window.arie.onUpdateAvailable) {
-      window.arie.onUpdateAvailable((info) => {
-        showUpdateBanner('downloading', info.version);
-      });
-    }
-    if (window.arie.onUpdateDownloaded) {
-      window.arie.onUpdateDownloaded((info) => {
-        showUpdateBanner('ready', info.version);
-      });
-    }
-
-    const user = await window.arie.app.getUser();
-    if(user) {
-      document.getElementById('sb-name').textContent = user.name || user.email || 'User';
-      document.getElementById('sb-av').textContent   = (user.name||'U').substring(0,2).toUpperCase();
-      document.getElementById('set-name').value  = user.name  || '';
-      document.getElementById('set-email').value = user.email || '';
-      if(user.connectedProviders && user.connectedProviders.length) {
-        user.connectedProviders.forEach(p => setConnected(p));
-        loadRealEmails(user.connectedProviders);
-        loadRealCalendar(user.connectedProviders);
-      }
-    }
-  }
-  nav('inbox');
-}
-
-async function loadRealEmails(providers) {
-  const allEmails = [];
-  for(const p of providers) {
-    if(p === 'apple') continue; // IMAP handled differently
-    if(p !== 'microsoft' && p !== 'google') continue;
-    const result = await window.arie.email.fetch(p);
-    if(result.ok && result.emails) allEmails.push(...result.emails);
-  }
-  if(allEmails.length) renderRealEmails(allEmails);
-}
-
-async function loadRealCalendar(providers) {
-  const allEvents = [];
-  for(const p of providers) {
-    if(p !== 'microsoft' && p !== 'google') continue;
-    const result = await window.arie.calendar.fetch(p);
-    if(result.ok && result.events) allEvents.push(...result.events);
-  }
-  if(allEvents.length) renderRealCalendar(allEvents);
-}
-
-function renderRealEmails(emails) {
-  const list = document.getElementById('email-list');
-  document.getElementById('not-connected-banner').style.display = 'none';
-
-  // Update unread badge
-  const unread = emails.filter(e => !e.isRead).length;
-  const nb = document.getElementById('nb-inbox');
-  if(nb) nb.textContent = unread || '';
-  // Report to tray / dock badge
-  if(window.arie) window.arie.app.setUnreadCount(unread);
-
-  list.innerHTML = emails.slice(0,8).map(e => {
-    const initials = (e.from||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const time = e.time ? new Date(e.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-    const srcBadge = e.provider === 'microsoft'
-      ? '<span class="ev-src ev-ms">Outlook</span>'
-      : '<span class="ev-src ev-gc">Gmail</span>';
-    const priBg = e.priority === 'high'
-      ? 'background:linear-gradient(135deg,#6E30D8,#EC4899)'
-      : 'background:linear-gradient(135deg,#364E6A,#1D3248)';
-    return `
-      <div class="er" id="email-real-${e.id}" onclick="openRealEmail(${JSON.stringify(e).replace(/"/g,'&quot;')})">
-        <div class="e-pr ${e.priority==='high'?'pr-hi':'pr-md'}"></div>
-        <div class="e-av" style="${priBg}">${initials}</div>
-        <div class="e-b">
-          <div class="e-from">${e.from || 'Unknown'}</div>
-          <div class="e-sub">${e.subject || '(no subject)'}</div>
-          <div class="e-ai" id="ai-summary-${e.id}">Analysing with Claude...</div>
-        </div>
-        <div class="e-meta">
-          <div class="e-time">${time}</div>
-          ${srcBadge}
-        </div>
-      </div>`;
-  }).join('');
-
-  // Summarise each email with Claude in the background
-  emails.slice(0,8).forEach(e => summariseEmail(e));
-}
-
-async function summariseEmail(email) {
-  if(!window.arie) return;
-  const el = document.getElementById('ai-summary-'+email.id);
-  if(!el) return;
-
-  const result = await window.arie.claude.chat([{
-    role:'user',
-    content:`Classify this email in ONE short sentence starting with "Question —" or "Statement —". Email: From: ${email.from}. Subject: ${email.subject}. Preview: ${email.preview||''}`
-  }], null, 'email');
-
-  if(result.text && el) {
-    el.textContent = result.text.replace(/^["']|["']$/g,'');
-    logQuery('email', result.usage?.input_tokens||0, result.usage?.output_tokens||0, result.cost||0);
-  }
-}
-
-function openRealEmail(email) {
-  document.querySelectorAll('.er').forEach(e=>e.classList.remove('active-email'));
-  const el = document.getElementById('email-real-'+email.id);
-  if(el) el.classList.add('active-email');
-
-  document.getElementById('email-empty').style.display = 'none';
-  const det = document.getElementById('email-detail');
-  det.style.display = 'flex';
-
-  const initials = (email.from||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  document.getElementById('ed-av').textContent = initials;
-  document.getElementById('ed-av').style.background = 'linear-gradient(135deg,#1E54D4,#08B5CF)';
-  document.getElementById('ed-from').textContent = email.from || 'Unknown';
-  document.getElementById('ed-time').textContent = email.time ? new Date(email.time).toLocaleString() : '';
-  document.getElementById('ed-sub').textContent  = email.subject || '(no subject)';
-  document.getElementById('ed-summary').textContent = 'Loading Claude analysis...';
-  document.getElementById('ed-type').innerHTML = '<span class="tag t-b">Analysing...</span>';
-  document.getElementById('conflict-banner').style.display = 'none';
-  document.getElementById('ed-instructions-card').style.display = 'none';
-  document.getElementById('ed-draft').style.display = 'none';
-  document.getElementById('style-learned').style.display = 'none';
-
-  currentEmail = email.id;
-  currentEmailData = email;
-
-  // Run Claude analysis on the real email
-  analyseRealEmail(email);
-}
-
-let currentEmailData = null;
-
-async function analyseRealEmail(email) {
-  if(!window.arie) return;
-  const result = await window.arie.claude.chat([{
-    role:'user',
-    content:`Analyse this email. 1) Is it a Question or Statement? 2) One sentence summary of what it says/asks. 3) Does it conflict with a Tuesday–Friday calendar (meetings at 9AM, 10AM, 1PM, 3:30PM)? Reply as JSON: {"type":"question|statement","summary":"...","calConflict":true|false,"calMsg":"..."}`
-  }, { role:'user', content:`From: ${email.from}\nSubject: ${email.subject}\nPreview: ${email.preview||''}` }],
-  null, 'email');
-
-  logQuery('email', result.usage?.input_tokens||0, result.usage?.output_tokens||0, result.cost||0);
-
-  let parsed = null;
-  try { parsed = JSON.parse(result.text.replace(/```json|```/g,'')); } catch {}
-
-  if(parsed) {
-    document.getElementById('ed-summary').textContent = parsed.summary || email.preview;
-    document.getElementById('ed-type').innerHTML = parsed.type === 'question'
-      ? '<span class="tag t-r">Question — reply needed</span>'
-      : '<span class="tag t-m">Statement — FYI</span>';
-
-    if(parsed.calConflict && parsed.calMsg) {
-      document.getElementById('conflict-banner').style.display = 'block';
-      document.getElementById('conflict-msg').textContent = parsed.calMsg;
-    }
-
-    if(parsed.type === 'question') {
-      document.getElementById('ed-instructions-card').style.display = 'block';
-      // Auto-generate a draft
-      generateRealDraft(email);
-    } else {
-      // FYI — still offer a quick reply
-      document.getElementById('ed-instructions-card').style.display = 'block';
-    }
-  } else {
-    document.getElementById('ed-summary').textContent = email.preview || 'No preview available.';
-    document.getElementById('ed-type').innerHTML = '<span class="tag t-m">Email</span>';
-    document.getElementById('ed-instructions-card').style.display = 'block';
-  }
-}
-
-async function generateRealDraft(email) {
-  if(!window.arie) return;
-  const instructions = document.getElementById('ed-instructions').value;
-  const draftDiv  = document.getElementById('ed-draft');
-  const draftText = document.getElementById('ed-draft-text');
-  const conf      = document.getElementById('ed-conf');
-  draftText.value = 'Drafting...';
-  draftDiv.style.display = 'block';
-  conf.textContent = '...';
-
-  const system = `You are drafting a professional email reply on behalf of the user. Style: short sentences, direct, professional, active voice, sign off with just the user's first name.${instructions ? ' User instructions: '+instructions : ''}`;
-  const result = await window.arie.claude.chat([{
-    role:'user',
-    content:`Draft a reply to this email.\nFrom: ${email.from}\nSubject: ${email.subject}\nContent: ${email.preview||''}`
-  }], system, 'email');
-
-  logQuery('email', result.usage?.input_tokens||0, result.usage?.output_tokens||0, result.cost||0);
-  draftText.value  = result.error ? ('Error: '+result.error) : result.text;
-  conf.textContent = result.error ? 'Error' : '91%';
-  draftEdited = false;
-  document.getElementById('style-learned').style.display = 'none';
-  document.getElementById('learn-btn').style.display = 'none';
-}
-
-function renderRealCalendar(events) {
-  const calCard = document.querySelector('#pg-calendar .card');
-  if(!calCard) return;
-
-  const sorted = events.sort((a,b) => new Date(a.start) - new Date(b.start));
-  const today  = new Date().toDateString();
-  const todayEvents = sorted.filter(e => new Date(e.start).toDateString() === today);
-  const upcoming    = sorted.filter(e => new Date(e.start).toDateString() !== today).slice(0,5);
-
-  // Update "Today" section
-  const evContainer = calCard.querySelector('.ev')?.parentElement || calCard;
-  const existingEvs = calCard.querySelectorAll('.ev');
-  existingEvs.forEach(e => e.remove());
-
-  const evHTML = (todayEvents.length ? todayEvents : sorted.slice(0,4)).map(e => {
-    const start  = new Date(e.start);
-    const hr     = start.getHours().toString().padStart(2,'0');
-    const min    = start.getMinutes().toString().padStart(2,'0');
-    const ampm   = start.getHours() < 12 ? 'AM' : 'PM';
-    const srcBadge = e.provider === 'microsoft'
-      ? '<span class="ev-src ev-ms" style="margin-left:6px">Outlook</span>'
-      : '<span class="ev-src ev-gc" style="margin-left:6px">Google</span>';
-    const colors = ['#1E54D4','#08B5CF','#E09B1A','#0FA870','#6E30D8'];
-    const col = colors[Math.abs(e.id?.charCodeAt(0)||0) % colors.length];
-    return `<div class="ev">
-      <div class="ev-time"><div class="ev-t">${hr}:${min}</div><div class="ev-ap">${ampm}</div></div>
-      <div class="ev-spine"><div class="ev-dot" style="background:${col}"></div><div class="ev-line"></div></div>
-      <div class="ev-info">
-        <div class="ev-title">${e.title||'(no title)'}${srcBadge}</div>
-        <div class="ev-det">${e.location||''}</div>
-        <div class="ev-acts"><button class="btn b-g b-sm" onclick="askCalClaude('general')">Brief me</button></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  calCard.insertAdjacentHTML('beforeend', evHTML);
-
-  // Update "This Week" card
-  const weekCard = document.querySelector('#pg-calendar .col-stack .card:last-child');
-  if(weekCard && upcoming.length) {
-    weekCard.querySelector('.ct').textContent = 'Coming Up';
-    const rows = weekCard.querySelectorAll('div[style*="border-bottom"]');
-    rows.forEach((r,i) => {
-      if(upcoming[i]) {
-        const d = new Date(upcoming[i].start);
-        r.querySelector('span:first-child').textContent = upcoming[i].title;
-        r.querySelector('span:last-child').textContent  = d.toLocaleDateString('en-AU',{weekday:'short',hour:'2-digit',minute:'2-digit'});
-      }
-    });
-  }
-}
-
-init();
-
-document.addEventListener('keydown', e=>{
-  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();toggleAI();}
-  if(e.key==='Escape') document.getElementById('aip').classList.remove('op');
-});
-
-// ── Feedback ──────────────────────────────────────────────────
-let fbType   = 'Idea';
-let fbRating = 0;
-
-function selectFbType(btn) {
-  document.querySelectorAll('.fb-type').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  fbType = btn.dataset.type;
-}
-
-function rateFb(n) {
-  fbRating = n;
-  document.querySelectorAll('.fb-star').forEach((s, i) => {
-    s.style.opacity  = i < n ? '1' : '.35';
-    s.style.color    = i < n ? 'var(--gd)' : '';
-  });
-}
-
-async function submitFeedback() {
-  const body = document.getElementById('fb-body').value.trim();
-  if (!body) return;
-
-  const noEmailEl  = document.getElementById('fb-no-email');
-  const submitBtn  = document.getElementById('fb-submit');
-  const sentEl     = document.getElementById('fb-sent');
-
-  // Check a provider is connected
-  const providers = store.get ? store.get('connectedProviders', []) : [];
-  let provider = null;
-  if (window.arie) {
-    const user = await window.arie.app.getUser();
-    if (user.connectedProviders && user.connectedProviders.length) {
-      provider = user.connectedProviders.find(p => p === 'microsoft' || p === 'google');
-    }
-  }
-
-  if (!provider && window.arie) {
-    noEmailEl.style.display = 'block';
-    return;
-  }
-
-  noEmailEl.style.display = 'none';
-  submitBtn.textContent = 'Sending...';
-  submitBtn.disabled    = true;
-
-  const rating  = fbRating > 0 ? `Rating: ${fbRating}/5\n` : '';
-  const subject = `[Arie Feedback] ${fbType}`;
-  const emailBody = `Type: ${fbType}\n${rating}\n${body}\n\n---\nSent from Arie AI`;
-
-  // Send to both addresses
-  const targets = ['71800@cgs.act.edu.au', 'send2lucasjohn@gmail.com'];
-  let allOk = true;
-
-  if (window.arie) {
-    for (const to of targets) {
-      const result = await window.arie.email.send({ provider, to, subject, body: emailBody });
-      if (result.error) { allOk = false; console.error('[feedback]', result.error); }
-    }
-  } else {
-    // demo mode
-    await new Promise(r => setTimeout(r, 900));
-  }
-
-  if (allOk) {
-    sentEl.style.display  = 'block';
-    submitBtn.style.display = 'none';
-    document.getElementById('fb-body').value = '';
-    fbRating = 0;
-    document.querySelectorAll('.fb-star').forEach(s => { s.style.opacity = '.35'; s.style.color = ''; });
-    document.querySelectorAll('.fb-type').forEach((b,i) => { b.classList.toggle('on', i===0); });
-    fbType = 'Idea';
-    setTimeout(() => {
-      sentEl.style.display    = 'none';
-      submitBtn.style.display = '';
-      submitBtn.textContent   = 'Send feedback';
-      submitBtn.disabled      = false;
-    }, 4000);
-  } else {
-    submitBtn.textContent = 'Failed — try again';
-    submitBtn.style.background = 'var(--rs)';
-    setTimeout(() => {
-      submitBtn.textContent      = 'Send feedback';
-      submitBtn.style.background = '';
-      submitBtn.disabled         = false;
-    }, 2500);
-  }
-}
-
-// ── App init: show reports nav for CEO accounts ───────────────
-(async function initExtended() {
-  if (!window.arie) return;
-  try {
-    const user = await window.arie.app.getUserFull();
-    if (user?.accountType === 'ceo') {
-      document.getElementById('ni-reports').style.display = 'flex';
-    }
-    // Check if tracking is enabled for this user (staff)
-    if (user?.accountType === 'staff') {
-      const ts = await window.arie.app.getTrackingStatus();
-      if (ts?.enabled) {
-        window.arie.tracker.record('login', 'App opened');
-      }
-    }
-  } catch(e) { console.warn('Extended init failed:', e.message); }
-})();
-
-// ── Reports page ──────────────────────────────────────────────
-let _reportsMemberId   = null;
-let _reportsMemberName = null;
-let _teamMembers       = [];
-
-async function loadReportsPage() {
-  await loadTrackingToggles();
-  await buildMemberList();
-}
-
-async function loadTrackingToggles() {
-  if (!window.arie) return;
-  const API   = 'http://localhost:3001';
-  const token = null; // token managed by main process — fetch via IPC
-  try {
-    const ws = await window.arie.app.getWorkspace();
-    if (!ws?.workspace?.id) return;
-    const res  = await fetch(`${API}/workspaces/${ws.workspace.id}/members`, {
-      headers: { Authorization: 'Bearer ' + (localStorage.getItem('arieToken') || '') },
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    _teamMembers = data.members || [];
-    const box = document.getElementById('tracking-toggles');
-    if (!_teamMembers.length) { box.innerHTML = '<div style="color:var(--d1);font-size:13px">No team members yet.</div>'; return; }
-    box.innerHTML = _teamMembers.map(m => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--s2);border-radius:8px;margin-bottom:6px">
-        <div style="display:flex;align-items:center;gap:9px">
-          <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#1E54D4,#08B5CF);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;font-family:var(--fh)">${(m.name||'?').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase()}</div>
-          <div><div style="font-size:13px;font-weight:600;color:var(--tx)">${m.name}</div><div style="font-size:11px;color:var(--d1)">${m.role}</div></div>
-        </div>
-        <label style="position:relative;display:inline-block;width:38px;height:20px;cursor:pointer">
-          <input type="checkbox" ${m.activityReportingEnabled?'checked':''} onchange="setTracking('${m.id}',this.checked,'${m.name}')" style="opacity:0;width:0;height:0">
-          <span style="position:absolute;inset:0;background:${m.activityReportingEnabled?'var(--a1)':'var(--d3)'};border-radius:20px;transition:.2s"></span>
-          <span style="position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:${m.activityReportingEnabled?'21px':'3px'};transition:.2s"></span>
-        </label>
-      </div>
-    `).join('');
-  } catch(e) { document.getElementById('tracking-toggles').innerHTML = '<div style="color:var(--d1);font-size:12px">Connect to backend to manage tracking.</div>'; }
-}
-
-async function setTracking(memberId, enabled, memberName) {
-  try {
-    const ws  = await window.arie.app.getWorkspace();
-    const wsId = ws?.workspace?.id;
-    if (!wsId) return;
-    await fetch(`http://localhost:3001/api/admin/workspaces/${wsId}/members/${memberId}/tracking`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer '+(localStorage.getItem('arieToken')||'') },
-      body: JSON.stringify({ activity_reporting_enabled: enabled }),
-    });
-  } catch {}
-}
-
-async function buildMemberList() {
-  const tracked = _teamMembers.filter(m => m.activityReportingEnabled);
-  const el = document.getElementById('reports-member-list');
-  if (!tracked.length) { el.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--d1)">No members with tracking enabled.</div>'; return; }
-  el.innerHTML = tracked.map(m => `
-    <div onclick="selectMember('${m.id}','${m.name.replace(/'/g,"\\\'")}')" style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
-      <div style="width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#1E54D4,#08B5CF);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;font-family:var(--fh);flex-shrink:0">${(m.name||'').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase()}</div>
-      <div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}</div>
-    </div>
-  `).join('');
-}
-
-async function selectMember(id, name) {
-  _reportsMemberId   = id;
-  _reportsMemberName = name;
-  await loadReports();
-}
-
-async function loadReports() {
-  if (!_reportsMemberId) return;
-  const detail = document.getElementById('report-detail');
-  detail.innerHTML = '<div class="card" style="padding:24px;text-align:center;color:var(--d1)">Fetching and decrypting reports...</div>';
-  try {
-    const days = document.getElementById('reports-days')?.value || 7;
-    const to   = new Date().toISOString().slice(0,10);
-    const from = new Date(Date.now()-days*86400000).toISOString().slice(0,10);
-    const ws   = await window.arie.app.getWorkspace();
-    const wsId = ws?.workspace?.id;
-    const res  = await fetch(`http://localhost:3001/api/reports?workspace_id=${wsId}&user_id=${_reportsMemberId}&from=${from}&to=${to}`, {
-      headers: { Authorization: 'Bearer '+(localStorage.getItem('arieToken')||'') },
-    });
-    if (!res.ok) throw new Error('Failed to fetch reports');
-    const { reports = [] } = await res.json();
-
-    if (!reports.length) {
-      detail.innerHTML = `<div class="card" style="padding:40px 24px;text-align:center;color:var(--d1)"><div style="font-size:28px;margin-bottom:10px">📭</div>No reports for ${_reportsMemberName} in this period.</div>`;
-      return;
-    }
-
-    // Reports come pre-decrypted from the API if using plaintext fallback,
-    // or as encrypted payloads if E2EE is active (decryption via Electron main)
-    detail.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        ${reports.map(r => `
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-size:13px;font-weight:600;color:var(--tx)">${r.report_date}</div>
-              <span style="font-size:10px;color:var(--d2);font-family:monospace">🔐 E2EE</span>
-            </div>
-            <div style="display:flex;gap:10px;margin-bottom:12px">
-              <div style="flex:1;background:var(--s2);border-radius:7px;padding:10px;text-align:center">
-                <div style="font-family:var(--fh);font-size:1.4rem;font-weight:800;color:var(--tx)">${r.active_hours??'—'}</div>
-                <div style="font-size:10px;color:var(--d1)">active hours</div>
-              </div>
-              <div style="flex:1;background:var(--s2);border-radius:7px;padding:10px;text-align:center">
-                <div style="font-family:var(--fh);font-size:1.4rem;font-weight:800;color:var(--tx)">${(r.tasks_completed||[]).length}</div>
-                <div style="font-size:10px;color:var(--d1)">tasks done</div>
-              </div>
-              <div style="flex:1;background:var(--s2);border-radius:7px;padding:10px;text-align:center">
-                <div style="font-family:var(--fh);font-size:1rem;font-weight:800;color:var(--tx)">${r.peak_hours??'—'}</div>
-                <div style="font-size:10px;color:var(--d1)">peak hours</div>
-              </div>
-            </div>
-            ${r.summary?`<div style="font-size:12px;color:var(--d1);line-height:1.6;margin-bottom:10px">${r.summary}</div>`:''}
-            ${(r.tasks_completed||[]).length?`
-              <div style="font-size:10px;font-weight:700;color:var(--d1);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Completed</div>
-              ${(r.tasks_completed||[]).map(t=>`<div style="display:flex;gap:7px;font-size:12px;color:var(--tx);margin-bottom:4px"><span style="color:var(--gn)">✓</span>${t}</div>`).join('')}
-            `:''}
-          </div>
-        `).join('')}
-      </div>
-    `;
-  } catch(e) {
-    detail.innerHTML = `<div class="card" style="padding:24px;color:var(--d1)">Failed to load reports: ${e.message}</div>`;
-  }
-}
-
-</script>
+<script src="app.js"></script>
 </body>
 </html>

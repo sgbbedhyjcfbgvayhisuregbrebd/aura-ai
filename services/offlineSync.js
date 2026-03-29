@@ -70,21 +70,27 @@ function checkOnline() {
 function onOnline(cb)  { _onlineCallbacks.push(cb); }
 function onOffline(cb) { _offlineCallbacks.push(cb); }
 
-// Poll every 15 seconds
-setInterval(() => {
-  const nowOnline = checkOnline();
-  if (nowOnline !== _isOnline) {
-    _isOnline = nowOnline;
-    if (_isOnline) {
-      console.log('[sync] Connection restored — replaying outbox');
-      _onlineCallbacks.forEach(cb => cb());
-      replayOutbox();
-    } else {
-      console.log('[sync] Connection lost — offline mode active');
-      _offlineCallbacks.forEach(cb => cb());
+// FIX: do NOT start setInterval at module load time. The interval is started inside
+// init() so that cacheDb is guaranteed to be initialised before replayOutbox() runs.
+let _pollTimer = null;
+
+function startNetworkPoller() {
+  if (_pollTimer) return;
+  _pollTimer = setInterval(() => {
+    const nowOnline = checkOnline();
+    if (nowOnline !== _isOnline) {
+      _isOnline = nowOnline;
+      if (_isOnline) {
+        console.log('[sync] Connection restored — replaying outbox');
+        _onlineCallbacks.forEach(cb => cb());
+        replayOutbox();
+      } else {
+        console.log('[sync] Connection lost — offline mode active');
+        _offlineCallbacks.forEach(cb => cb());
+      }
     }
-  }
-}, 15000);
+  }, 15000);
+}
 
 // ── Cache: read ────────────────────────────────────────────────────
 
@@ -298,11 +304,22 @@ ipcMain.handle('sync:invalidateCache',  (_, key)  => invalidateCache(key));
 
 function init() {
   initCacheDb();
+  // FIX: network poller is now started here, AFTER cacheDb is ready
+  startNetworkPoller();
   console.log('[sync] Offline sync service ready');
+}
+
+function stop() {
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+}
+
+function getOutboxCount() {
+  return cacheDb?.prepare('SELECT COUNT(*) as n FROM outbox').get()?.n ?? 0;
 }
 
 module.exports = {
   init,
+  stop,
   checkOnline,
   onOnline,
   onOffline,
@@ -315,4 +332,5 @@ module.exports = {
   saveDraftOffline,
   getOfflineDraft,
   listOfflineDrafts,
+  getOutboxCount,
 };
