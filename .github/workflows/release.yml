@@ -19,13 +19,19 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
 
+      - name: Generate self-signed cert
+        run: |
+          $cert = New-SelfSignedCertificate -Type CodeSigning -Subject "CN=Renzo AI" -KeyUsage DigitalSignature -FriendlyName "Renzo AI" -CertStoreLocation "Cert:\CurrentUser\My" -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
+          $pwd = ConvertTo-SecureString -String "RenzoAI2025!" -Force -AsPlainText
+          Export-PfxCertificate -Cert "Cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath build\cert.p12 -Password $pwd
+
       - name: Build Windows
         run: npx electron-builder --win --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WIN_CSC_LINK: "build/cert.p12"
+          WIN_CSC_KEY_PASSWORD: "RenzoAI2025!"
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
-          WIN_CSC_LINK: "build/fake.p12"
-          WIN_CSC_KEY_PASSWORD: "fake"
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
