@@ -1,151 +1,147 @@
 {
-  "name": "renzo-ai",
-  "version": "1.0.0",
-  "description": "Renzo — AI Assistant for Professional Services",
-  "main": "src/main/index.js",
-  "homepage": "https://renzo.ai",
-  "author": {
-    "name": "Renzo AI",
-    "email": "hello@renzo.ai"
-  },
-  "license": "UNLICENSED",
-  "private": true,
-  "scripts": {
-    "start": "electron .",
-    "dev": "NODE_ENV=development electron .",
-    "gen-icons": "node scripts/gen-icons.js",
-    "build:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 --x64",
-    "build:mac:arm64": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64",
-    "build:mac:x64": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --x64",
-    "build:win": "electron-builder --win --x64 --config.win.sign=false",
-    "build:all": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --win --arm64 --x64",
-    "build:mac:signed": "electron-builder --mac --arm64 --x64"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "electron-store": "^8.1.0",
-    "electron-updater": "^6.1.7",
-    "node-fetch": "^3.3.2"
-  },
-  "devDependencies": {
-    "@electron/notarize": "^2.3.0",
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0",
-    "png2icons": "^2.0.1",
-    "sharp": "^0.33.2"
-  },
-  "build": {
-    "appId": "ai.renzo.app",
-    "productName": "Renzo",
-    "copyright": "Copyright © 2025 Renzo AI",
-    "files": [
-      "src/**/*",
-      "assets/**/*",
-      "!assets/icons/mac/icon.iconset/**",
-      "!**/*.map",
-      "!**/node_modules/.cache/**"
-    ],
-    "extraResources": [
-      {
-        "from": ".env",
-        "to": ".env",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "asar": true,
-    "asarUnpack": [
-      "**/node_modules/sharp/**",
-      "**/node_modules/@img/**"
-    ],
-    "mac": {
-      "appId": "ai.renzo.app",
-      "category": "public.app-category.productivity",
-      "icon": "assets/icon.icns",
-      "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "notarize": false,
-      "identity": null,
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        }
-      ]
-    },
-    "dmg": {
-      "title": "${productName} ${version}",
-      "background": "assets/dmg-bg.png",
-      "icon": "assets/icon.icns",
-      "iconSize": 100,
-      "window": {
-        "width": 540,
-        "height": 380
-      },
-      "contents": [
-        {
-          "x": 140,
-          "y": 200,
-          "type": "file"
-        },
-        {
-          "x": 400,
-          "y": 200,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "win": {
-      "appId": "ai.renzo.app",
-      "icon": "assets/icon.ico",
-      "target": [
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "verifyUpdateCodeSignature": false,
-      "sign": false,
-      
-      
-      "certificatePassword": null
-    },
-    "linux": {
-      "icon": "assets/icon.png",
-      "category": "Office",
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "publish": {
-      "provider": "generic",
-      "url": "https://renzo-ai.netlify.app/releases"
-    },
-    "afterSign": "scripts/notarize.js",
-    "protocols": [
-      {
-        "name": "renzo-ai",
-        "schemes": [
-          "renzo-ai"
-        ]
-      }
-    ]
-  }
+    "name":  "renzo-ai",
+    "version":  "1.0.0",
+    "description":  "Renzo — AI Assistant for Professional Services",
+    "main":  "src/main/index.js",
+    "homepage":  "https://renzo.ai",
+    "author":  {
+                   "name":  "Renzo AI",
+                   "email":  "hello@renzo.ai"
+               },
+    "license":  "UNLICENSED",
+    "private":  true,
+    "scripts":  {
+                    "start":  "electron .",
+                    "dev":  "NODE_ENV=development electron .",
+                    "gen-icons":  "node scripts/gen-icons.js",
+                    "build:mac":  "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 --x64",
+                    "build:mac:arm64":  "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64",
+                    "build:mac:x64":  "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --x64",
+                    "build:win":  "electron-builder --win --x64 --config.win.sign=false",
+                    "build:all":  "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --win --arm64 --x64",
+                    "build:mac:signed":  "electron-builder --mac --arm64 --x64"
+                },
+    "dependencies":  {
+                         "dotenv":  "^16.3.1",
+                         "electron-store":  "^8.1.0",
+                         "electron-updater":  "^6.1.7",
+                         "node-fetch":  "^3.3.2"
+                     },
+    "devDependencies":  {
+                            "@electron/notarize":  "^2.3.0",
+                            "electron":  "^28.0.0",
+                            "electron-builder":  "^24.0.0",
+                            "png2icons":  "^2.0.1",
+                            "sharp":  "^0.33.2"
+                        },
+    "build":  {
+                  "appId":  "ai.renzo.app",
+                  "productName":  "Renzo",
+                  "copyright":  "Copyright © 2025 Renzo AI",
+                  "files":  [
+                                "src/**/*",
+                                "assets/**/*",
+                                "!assets/icons/mac/icon.iconset/**",
+                                "!**/*.map",
+                                "!**/node_modules/.cache/**"
+                            ],
+                  "extraResources":  [
+                                         {
+                                             "from":  ".env",
+                                             "to":  ".env",
+                                             "filter":  [
+                                                            "**/*"
+                                                        ]
+                                         }
+                                     ],
+                  "asar":  true,
+                  "asarUnpack":  [
+                                     "**/node_modules/sharp/**",
+                                     "**/node_modules/@img/**"
+                                 ],
+                  "mac":  {
+                              "appId":  "ai.renzo.app",
+                              "category":  "public.app-category.productivity",
+                              "icon":  "assets/icon.icns",
+                              "hardenedRuntime":  false,
+                              "gatekeeperAssess":  false,
+                              "entitlements":  "build/entitlements.mac.plist",
+                              "entitlementsInherit":  "build/entitlements.mac.plist",
+                              "notarize":  false,
+                              "identity":  null,
+                              "target":  [
+                                             {
+                                                 "target":  "dmg",
+                                                 "arch":  [
+                                                              "arm64",
+                                                              "x64"
+                                                          ]
+                                             },
+                                             {
+                                                 "target":  "zip",
+                                                 "arch":  [
+                                                              "arm64",
+                                                              "x64"
+                                                          ]
+                                             }
+                                         ]
+                          },
+                  "dmg":  {
+                              "title":  "${productName} ${version}",
+                              "background":  "assets/dmg-bg.png",
+                              "icon":  "assets/icon.icns",
+                              "iconSize":  100,
+                              "window":  {
+                                             "width":  540,
+                                             "height":  380
+                                         },
+                              "contents":  [
+                                               {
+                                                   "x":  140,
+                                                   "y":  200,
+                                                   "type":  "file"
+                                               },
+                                               {
+                                                   "x":  400,
+                                                   "y":  200,
+                                                   "type":  "link",
+                                                   "path":  "/Applications"
+                                               }
+                                           ]
+                          },
+                  "win":  {
+                              "appId":  "ai.renzo.app",
+                              "icon":  "assets/icon.ico",
+                              "target":  [
+                                             {
+                                                 "target":  "portable",
+                                                 "arch":  [
+                                                              "x64"
+                                                          ]
+                                             }
+                                         ],
+                              "verifyUpdateCodeSignature":  false,
+                              "sign":  false,
+                              "certificatePassword":  null
+                          },
+                  "linux":  {
+                                "icon":  "assets/icon.png",
+                                "category":  "Office",
+                                "target":  [
+                                               "AppImage",
+                                               "deb"
+                                           ]
+                            },
+                  "publish":  {
+                                  "provider":  "github"
+                              },
+                  "protocols":  [
+                                    {
+                                        "name":  "renzo-ai",
+                                        "schemes":  [
+                                                        "renzo-ai"
+                                                    ]
+                                    }
+                                ]
+              }
 }
