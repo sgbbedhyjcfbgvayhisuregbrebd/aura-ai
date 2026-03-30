@@ -19,17 +19,16 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
 
-      - name: Clear signing env
-        run: |
-          echo "WIN_CSC_LINK=" >> $env:GITHUB_ENV
-          echo "CSC_LINK=" >> $env:GITHUB_ENV
-          echo "CSC_KEY_PASSWORD=" >> $env:GITHUB_ENV
-          echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> $env:GITHUB_ENV
+      - name: Create dummy cert
+        run: echo "" > dummy.p12
 
       - name: Build Windows
         run: npx electron-builder --win --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WIN_CSC_LINK: dummy.p12
+          WIN_CSC_KEY_PASSWORD: ""
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
