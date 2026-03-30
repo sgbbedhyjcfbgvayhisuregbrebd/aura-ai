@@ -20,12 +20,12 @@ jobs:
         run: npm install --ignore-scripts
 
       - name: Build Windows
-        run: npx electron-builder --win --x64 --config.win.sign=null
+        run: npx electron-builder --win --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
-          WIN_CSC_LINK: "none"
-          WIN_CSC_KEY_PASSWORD: "none"
+          WIN_CSC_LINK: "build/fake.p12"
+          WIN_CSC_KEY_PASSWORD: "fake"
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
