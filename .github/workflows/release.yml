@@ -19,16 +19,12 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
 
-      - name: Create dummy cert
-        run: echo "" > dummy.p12
-
       - name: Build Windows
         run: npx electron-builder --win --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WIN_CSC_LINK: dummy.p12
-          WIN_CSC_KEY_PASSWORD: ""
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          CSC_LINK: ""
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
